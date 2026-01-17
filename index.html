@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Juego de Mesa - El Impostor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #121212; color: white; }
+        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #00ff88; border: none; border-radius: 5px; }
+        #resultado { margin-top: 20px; font-size: 24px; font-weight: bold; color: #ffeb3b; }
+    </style>
+</head>
+<body>
+    <h1>🌍 Localizador de Países</h1>
+    <p>Pulsa el botón para elegir un destino:</p>
+    <button onclick="elegirPais()">¡Girar Globo!</button>
+    <div id="resultado"></div>
+
+    <script>
+        function elegirPais() {
+            const paises = ["España", "Japón", "Brasil", "Australia", "Canadá", "Egipto", "Italia"];
+            const aleatorio = paises[Math.floor(Math.random() * paises.length)];
+            document.getElementById('resultado').innerText = "Tu destino es: " + aleatorio;
+        }
+    </script>
+</body>
+</html>
