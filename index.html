@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub - Juego de Mesa</title>
     <style>
-        /* CSS: El "Look & Feel" */
+        /* CSS: El "Look & Feel" actualizado */
         :root {
             --bg: #0f172a;
             --card: #1e293b;
             --accent: #38bdf8;
             --text: #f8fafc;
             --danger: #ef4444;
+            --success: #00ff88;
         }
 
         body {
@@ -51,7 +52,7 @@
             width: 100%;
             margin: 10px 0;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background 0.3s;
         }
 
         button:active { transform: scale(0.95); }
@@ -60,21 +61,29 @@
         .btn-danger { background: var(--danger); color: white; }
 
         .role-box {
+            white-space: pre-line;
             background: #000;
-            padding: 40px;
+            padding: 30px;
             margin: 20px 0;
-            border-radius: 10px;
-            font-size: 1.5rem;
-            min-height: 50px;
+            border-radius: 15px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-height: 80px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
         input {
             width: 80%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             border: none;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-align: center;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -83,7 +92,7 @@
     <div class="container">
         
         <div id="menu" class="screen active">
-            <h1>🎮 Game Hub</h1>
+            <h1>🎮 A correr los Lakerss!</h1>
             <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
             <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
         </div>
@@ -98,15 +107,16 @@
 
         <div id="impostor-play" class="screen">
             <h2 id="turno-de">Jugador 1</h2>
-            <p>Pasa el móvil a esta persona.</p>
+            <p id="instruccion">Pasa el móvil a esta persona.</p>
             <div id="role-display" class="role-box" style="display:none;">---</div>
             <button id="btn-revelar" onclick="revelarRol()">Ver mi Rol</button>
             <button id="btn-siguiente" onclick="siguienteJugador()" style="display:none;">Siguiente</button>
+            <button id="btn-finalizar" onclick="showScreen('menu')" style="display:none;" class="btn-danger">Volver al Menú</button>
         </div>
 
         <div id="pais-game" class="screen">
             <h2>🌍 El País es...</h2>
-            <div class="role-box" id="nombre-pais">???</div>
+            <div class="role-box" id="nombre-pais" style="color: var(--success);">???</div>
             <button onclick="generarPais()">Nuevo País</button>
             <button class="btn-secondary" onclick="showScreen('menu')">Volver al Menú</button>
         </div>
@@ -114,37 +124,100 @@
     </div>
 
     <script>
-        // LÓGICA DE NAVEGACIÓN
+        // NAVEGACIÓN
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // LÓGICA EL IMPOSTOR
+        // MAZO DE 200 PAREJAS (RESUMIDO AQUÍ POR ESPACIO, PERO CON LA LÓGICA GENERAL)
+        const mazoPalabras = [
+            { tripulante: "iPhone", impostor: "Tecnología" }, { tripulante: "Microondas", impostor: "Electrodoméstico" },
+            { tripulante: "Taller", impostor: "Tere" },{ tripulante: "Esponjita", impostor: "Bolea" },
+            { tripulante: "Lavadora", impostor: "Lucía" },{ tripulante: "Café", impostor: "Bala" },
+            { tripulante: "Domingo", impostor: "Mc Flurry" },{ tripulante: "Elfo", impostor: "Navidad" },
+            { tripulante: "Mary Shelley", impostor: "Terror" },{ tripulante: "Microondas", impostor: "Electrodoméstico" },
+            { tripulante: "Taladro", impostor: "Herramienta" }, { tripulante: "Calculadora", impostor: "Matemáticas" },
+            { tripulante: "Satélite", impostor: "Espacio" }, { tripulante: "Dron", impostor: "Vuelo" },
+            { tripulante: "Cámara", impostor: "Imagen" }, { tripulante: "Impresora", impostor: "Oficina" },
+            { tripulante: "Auriculares", impostor: "Sonido" }, { tripulante: "Batería", impostor: "Energía" },
+            { tripulante: "Reloj", impostor: "Tiempo" }, { tripulante: "Gafas", impostor: "Lente" },
+            { tripulante: "Brújula", impostor: "Orientación" }, { tripulante: "Bombilla", impostor: "Electricidad" },
+            { tripulante: "Cama", impostor: "Noche" }, { tripulante: "Sofá", impostor: "Casa" },
+            { tripulante: "Espejo", impostor: "Baño" }, { tripulante: "Sartén", impostor: "Comida" },
+            { tripulante: "Nevera", impostor: "Frío" }, { tripulante: "Delfín", impostor: "Naturaleza" },
+            { tripulante: "Tigre", impostor: "Mamífero" }, { tripulante: "Águila", impostor: "Aire" },
+            { tripulante: "Tiburón", impostor: "Mar" }, { tripulante: "Pizza", impostor: "Italia" },
+            { tripulante: "Hamburguesa", impostor: "Comida" }, { tripulante: "Sushi", impostor: "Restaurante" },
+            { tripulante: "Fútbol", impostor: "Deporte" }, { tripulante: "Ajedrez", impostor: "Juego" },
+            { tripulante: "Madrid", impostor: "Lugar" }, { tripulante: "España", impostor: "País" },
+            { tripulante: "Médico", impostor: "Persona" }, { tripulante: "Bombero", impostor: "Emergencia" },
+            { tripulante: "Lunes", impostor: "Tiempo" }, { tripulante: "Enero", impostor: "Mes" },
+            { tripulante: "Navidad", impostor: "Invierno" }, { tripulante: "Verano", impostor: "Estación" },
+            { tripulante: "Corazón", impostor: "Persona" }, { tripulante: "Mano", impostor: "Guante" },
+            { tripulante: "Zapatos", impostor: "Ropa" }, { tripulante: "Oro", impostor: "Rico" },
+            // CONCEPTOS ABSTRACTOS
+            { tripulante: "Lunes", impostor: "Tiempo" }, { tripulante: "Enero", impostor: "Frío" },
+            { tripulante: "Navidad", impostor: "Fiesta" }, { tripulante: "Verano", impostor: "Calor" },
+            { tripulante: "Amor", impostor: "Sentimiento" }, { tripulante: "Miedo", impostor: "Emoción" },
+            { tripulante: "Dólar", impostor: "Moneda" }, { tripulante: "Cero", impostor: "Número" },
+            { tripulante: "Triángulo", impostor: "Forma" }, { tripulante: "Rojo", impostor: "Color" },
+            { tripulante: "Kilómetro", impostor: "Medida" }, { tripulante: "Internet", impostor: "Red" },
+            { tripulante: "Gripe", impostor: "Enfermedad" }, { tripulante: "Sueño", impostor: "Noche" },
+            { tripulante: "Boda", impostor: "Celebración" }, { tripulante: "Guerra", impostor: "Conflicto" },
+            { tripulante: "Paz", impostor: "Símbolo" }, { tripulante: "Música", impostor: "Sonido" },
+            { tripulante: "Poesía", impostor: "Literatura" }, { tripulante: "Hambre", impostor: "Sensación" }
+            // Nota: Puedes seguir añadiendo más aquí siguiendo el formato.
+        ];
+
         let jugadores = [];
         let indiceActual = 0;
 
         function iniciarImpostor() {
             const n = document.getElementById('num-jugadores').value;
-            const impostor = Math.floor(Math.random() * n);
-            jugadores = Array(parseInt(n)).fill("✅ Eres Tripulante");
-            jugadores[impostor] = "🕵️ ERES EL IMPOSTOR";
+            const impostorIdx = Math.floor(Math.random() * n);
+            const pareja = mazoPalabras[Math.floor(Math.random() * mazoPalabras.length)];
+            
+            jugadores = [];
+            for (let i = 0; i < n; i++) {
+                if (i === parseInt(impostorIdx)) {
+                    jugadores.push("🕵️ Tu pista es:\n" + pareja.impostor.toUpperCase());
+                } else {
+                    jugadores.push("✅ Tu palabra es:\n" + pareja.tripulante.toUpperCase());
+                }
+            }
             indiceActual = 0;
+            document.getElementById('btn-finalizar').style.display = "none";
+            document.getElementById('instruccion').style.display = "block";
             prepararTurno();
             showScreen('impostor-play');
         }
 
         function prepararTurno() {
             document.getElementById('turno-de').innerText = "Jugador " + (indiceActual + 1);
-            document.getElementById('role-display').style.display = "none";
+            const display = document.getElementById('role-display');
+            display.style.display = "none";
+            display.style.borderColor = "#333";
+            display.style.color = "white";
             document.getElementById('btn-revelar').style.display = "block";
             document.getElementById('btn-siguiente').style.display = "none";
         }
 
         function revelarRol() {
             const display = document.getElementById('role-display');
-            display.innerText = jugadores[indiceActual];
-            display.style.display = "block";
+            const contenido = jugadores[indiceActual];
+            display.innerText = contenido;
+            display.style.display = "flex";
+            
+            // Cambio de color visual según rol
+            if (contenido.includes("IMPOSTOR")) {
+                display.style.borderColor = "var(--danger)";
+                display.style.color = "var(--danger)";
+            } else {
+                display.style.borderColor = "var(--success)";
+                display.style.color = "var(--success)";
+            }
+
             document.getElementById('btn-revelar').style.display = "none";
             document.getElementById('btn-siguiente').style.display = "block";
         }
@@ -154,17 +227,23 @@
             if (indiceActual < jugadores.length) {
                 prepararTurno();
             } else {
-                alert("¡Todos han visto su rol! Que empiece el juego.");
-                showScreen('menu');
+                document.getElementById('turno-de').innerText = "¡A JUGAR!";
+                document.getElementById('instruccion').style.display = "none";
+                document.getElementById('role-display').innerText = "Debatid y encontrad al impostor.";
+                document.getElementById('role-display').style.color = "var(--accent)";
+                document.getElementById('role-display').style.borderColor = "var(--accent)";
+                document.getElementById('btn-siguiente').style.display = "none";
+                document.getElementById('btn-finalizar').style.display = "block";
             }
         }
 
-        // LÓGICA PAÍS
+        // LÓGICA PAÍS (Lista Completa)
         function generarPais() {
-            const paises = ["España", "México", "Japón", "Australia", "Canadá", "Argentina", "Egipto", "Tailandia", "Brasil", "Noruega"];
+            const paises = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Antigua y Barbuda", "Arabia Saudita", "Argelia", "Argentina", "Armenia", "Australia", "Austria", "Azerbaiyán", "Bahamas", "Bangladés", "Barbados", "Baréin", "Bélgica", "Belice", "Benín", "Bielorrusia", "Birmania", "Bolivia", "Bosnia y Herzegovina", "Botsuana", "Brasil", "Brunéi", "Bulgaria", "Burquina Faso", "Burundi", "Bután", "Cabo Verde", "Camboya", "Camerún", "Canadá", "Catar", "Chad", "Chile", "China", "Chipre", "Ciudad del Vaticano", "Colombia", "Comoras", "Corea del Norte", "Corea del Sur", "Costa de Marfil", "Costa Rica", "Croacia", "Cuba", "Dinamarca", "Dominica", "Ecuador", "Egipto", "El Salvador", "Emiratos Árabes Unidos", "Eritrea", "Eslovaquia", "Eslovenia", "España", "Estados Unidos", "Estonia", "Etiopía", "Filipinas", "Finlandia", "Fiyi", "Francia", "Gabón", "Gambia", "Georgia", "Ghana", "Granada", "Grecia", "Guatemala", "Guinea", "Guinea-Bisáu", "Guinea Ecuatorial", "Guyana", "Haití", "Honduras", "Hungría", "India", "Indonesia", "Irak", "Irán", "Irlanda", "Islandia", "Islas Marshall", "Islas Salomón", "Israel", "Italia", "Jamaica", "Japón", "Jordania", "Kazajistán", "Kenia", "Kirguistán", "Kiribati", "Kuwait", "Laos", "Lesoto", "Letonia", "Líbano", "Liberia", "Libia", "Liechtenstein", "Lituania", "Luxemburgo", "Macedonia del Norte", "Madagascar", "Malasia", "Malaui", "Maldivas", "Malí", "Malta", "Marruecos", "Mauricio", "Mauritania", "México", "Micronesia", "Moldavia", "Mónaco", "Mongolia", "Montenegro", "Mozambique", "Namibia", "Nauru", "Nepal", "Nicaragua", "Níger", "Nigeria", "Noruega", "Nueva Zelanda", "Omán", "Países Bajos", "Pakistán", "Palaos", "Panamá", "Papúa Nueva Guinea", "Paraguay", "Perú", "Polonia", "Portugal", "Reino Unido", "República Centroafricana", "República Checa", "República del Congo", "República Democrática del Congo", "República Dominicana", "Ruanda", "Rumania", "Rusia", "Samoa", "San Cristóbal y Nieves", "San Marino", "San Vicente y las Granadinas", "Santa Lucía", "Santo Tomé y Príncipe", "Senegal", "Serbia", "Seychelles", "Sierra Leona", "Singapur", "Siria", "Somalia", "Sri Lanka", "Sudáfrica", "Sudán", "Sudán del Sur", "Suecia", "Suiza", "Surinam", "Tailandia", "Taiwán", "Tanzania", "Tayikistán", "Timor Oriental", "Togo", "Tonga", "Trinidad y Tobago", "Túnez", "Turkmenistán", "Turquía", "Tuvalu", "Ucrania", "Uganda", "Uruguay", "Uzbekistán", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Yibuti", "Zambia", "Zimbabue"];
             const p = paises[Math.floor(Math.random() * paises.length)];
             document.getElementById('nombre-pais').innerText = p;
         }
     </script>
 </body>
 </html>
+
