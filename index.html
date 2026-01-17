@@ -1,25 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Juego de Mesa - El Impostor</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub - Juego de Mesa</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: #121212; color: white; }
-        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #00ff88; border: none; border-radius: 5px; }
-        #resultado { margin-top: 20px; font-size: 24px; font-weight: bold; color: #ffeb3b; }
+        /* CSS: El "Look & Feel" */
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .screen { display: none; }
+        .active { display: block; }
+
+        h1 { color: var(--accent); margin-bottom: 1.5rem; }
+
+        button {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:active { transform: scale(0.95); }
+
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        .role-box {
+            background: #000;
+            padding: 40px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            min-height: 50px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>🌍 Localizador de Países</h1>
-    <p>Pulsa el botón para elegir un destino:</p>
-    <button onclick="elegirPais()">¡Girar Globo!</button>
-    <div id="resultado"></div>
+
+    <div class="container">
+        
+        <div id="menu" class="screen active">
+            <h1>🎮 Game Hub</h1>
+            <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
+            <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
+        </div>
+
+        <div id="impostor-config" class="screen">
+            <h2>Configuración</h2>
+            <p>¿Cuántos jugadores sois?</p>
+            <input type="number" id="num-jugadores" value="4" min="3">
+            <button onclick="iniciarImpostor()">Empezar Partida</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">Volver</button>
+        </div>
+
+        <div id="impostor-play" class="screen">
+            <h2 id="turno-de">Jugador 1</h2>
+            <p>Pasa el móvil a esta persona.</p>
+            <div id="role-display" class="role-box" style="display:none;">---</div>
+            <button id="btn-revelar" onclick="revelarRol()">Ver mi Rol</button>
+            <button id="btn-siguiente" onclick="siguienteJugador()" style="display:none;">Siguiente</button>
+        </div>
+
+        <div id="pais-game" class="screen">
+            <h2>🌍 El País es...</h2>
+            <div class="role-box" id="nombre-pais">???</div>
+            <button onclick="generarPais()">Nuevo País</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">Volver al Menú</button>
+        </div>
+
+    </div>
 
     <script>
-        function elegirPais() {
-            const paises = ["España", "Japón", "Brasil", "Australia", "Canadá", "Egipto", "Italia"];
-            const aleatorio = paises[Math.floor(Math.random() * paises.length)];
-            document.getElementById('resultado').innerText = "Tu destino es: " + aleatorio;
+        // LÓGICA DE NAVEGACIÓN
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // LÓGICA EL IMPOSTOR
+        let jugadores = [];
+        let indiceActual = 0;
+
+        function iniciarImpostor() {
+            const n = document.getElementById('num-jugadores').value;
+            const impostor = Math.floor(Math.random() * n);
+            jugadores = Array(parseInt(n)).fill("✅ Eres Tripulante");
+            jugadores[impostor] = "🕵️ ERES EL IMPOSTOR";
+            indiceActual = 0;
+            prepararTurno();
+            showScreen('impostor-play');
+        }
+
+        function prepararTurno() {
+            document.getElementById('turno-de').innerText = "Jugador " + (indiceActual + 1);
+            document.getElementById('role-display').style.display = "none";
+            document.getElementById('btn-revelar').style.display = "block";
+            document.getElementById('btn-siguiente').style.display = "none";
+        }
+
+        function revelarRol() {
+            const display = document.getElementById('role-display');
+            display.innerText = jugadores[indiceActual];
+            display.style.display = "block";
+            document.getElementById('btn-revelar').style.display = "none";
+            document.getElementById('btn-siguiente').style.display = "block";
+        }
+
+        function siguienteJugador() {
+            indiceActual++;
+            if (indiceActual < jugadores.length) {
+                prepararTurno();
+            } else {
+                alert("¡Todos han visto su rol! Que empiece el juego.");
+                showScreen('menu');
+            }
+        }
+
+        // LÓGICA PAÍS
+        function generarPais() {
+            const paises = ["España", "México", "Japón", "Australia", "Canadá", "Argentina", "Egipto", "Tailandia", "Brasil", "Noruega"];
+            const p = paises[Math.floor(Math.random() * paises.length)];
+            document.getElementById('nombre-pais').innerText = p;
         }
     </script>
 </body>
