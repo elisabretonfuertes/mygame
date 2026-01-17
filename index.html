@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub - Juego de Mesa</title>
     <style>
-        /* CSS: El "Look & Feel" actualizado */
+        /* CSS: Estética Clara y Rosa (Light Mode) */
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #38bdf8;
-            --text: #f8fafc;
-            --danger: #ef4444;
-            --success: #00ff88;
+            --bg: #f8fafc;         /* Fondo gris casi blanco */
+            --card: #ffffff;       /* Contenedor blanco puro */
+            --accent: #ec4899;     /* Rosa vibrante para títulos */
+            --text: #1e293b;       /* Texto oscuro para lectura clara */
+            --button: #f472b6;     /* Rosa suave para botones */
+            --danger: #ef4444;     /* Rojo para el Impostor */
+            --success: #10b981;    /* Verde para Tripulante */
+            --secondary: #94a3b8;  /* Gris para botones secundarios */
         }
 
         body {
@@ -31,60 +33,78 @@
             width: 90%;
             max-width: 400px;
             background: var(--card);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            padding: 2.5rem 1.5rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04); /* Sombra muy suave */
+        }
+
+        /* TÍTULOS EN ROSA */
+        h1, h2 { 
+            color: var(--accent); 
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .screen { display: none; }
         .active { display: block; }
 
-        h1 { color: var(--accent); margin-bottom: 1.5rem; }
-
+        /* BOTONES EN ROSA */
         button {
-            background: var(--accent);
-            color: var(--bg);
+            background: var(--button);
+            color: white;
             border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
+            padding: 16px 25px;
+            border-radius: 14px;
             font-weight: bold;
             font-size: 1rem;
             width: 100%;
             margin: 10px 0;
             cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.2);
         }
 
-        button:active { transform: scale(0.95); }
+        button:active { transform: scale(0.96); }
 
-        .btn-secondary { background: #64748b; color: white; }
-        .btn-danger { background: var(--danger); color: white; }
+        .btn-secondary { background: var(--secondary); box-shadow: none; }
+        .btn-danger { background: var(--danger); box-shadow: none; }
 
+        /* CAJA DE ROL REVELADO */
         .role-box {
             white-space: pre-line;
-            background: #000;
-            padding: 30px;
+            background: #f1f5f9; /* Fondo gris claro */
+            padding: 35px 20px;
             margin: 20px 0;
-            border-radius: 15px;
-            font-size: 1.4rem;
+            border-radius: 20px;
+            font-size: 1.5rem;
             font-weight: bold;
             min-height: 80px;
-            border: 2px solid #333;
+            border: 3px dashed #e2e8f0; /* Borde discontinuo moderno */
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            color: var(--text);
         }
 
         input {
-            width: 80%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            margin-bottom: 15px;
+            width: 70%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 20px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            color: var(--text);
+            outline: none;
+            background: white;
         }
+
+        input:focus { border-color: var(--accent); }
+
+        p { color: #64748b; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -92,51 +112,49 @@
     <div class="container">
         
         <div id="menu" class="screen active">
-            <h1>🎮 A correr los Lakerss!</h1>
+            <h1>🎮 A CORRER LOS LAKERSS!</h1>
             <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
             <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
         </div>
 
         <div id="impostor-config" class="screen">
-            <h2>Configuración</h2>
+            <h2>🕵️ CONFIGURACIÓN</h2>
             <p>¿Cuántos jugadores sois?</p>
             <input type="number" id="num-jugadores" value="4" min="3">
-            <button onclick="iniciarImpostor()">Empezar Partida</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver</button>
+            <button onclick="iniciarImpostor()">EMPEZAR PARTIDA</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
         <div id="impostor-play" class="screen">
-            <h2 id="turno-de">Jugador 1</h2>
+            <h2 id="turno-de">JUGADOR 1</h2>
             <p id="instruccion">Pasa el móvil a esta persona.</p>
             <div id="role-display" class="role-box" style="display:none;">---</div>
-            <button id="btn-revelar" onclick="revelarRol()">Ver mi Rol</button>
-            <button id="btn-siguiente" onclick="siguienteJugador()" style="display:none;">Siguiente</button>
-            <button id="btn-finalizar" onclick="showScreen('menu')" style="display:none;" class="btn-danger">Volver al Menú</button>
+            <button id="btn-revelar" onclick="revelarRol()">VER MI ROL</button>
+            <button id="btn-siguiente" onclick="siguienteJugador()" style="display:none;">SIGUIENTE</button>
+            <button id="btn-finalizar" onclick="showScreen('menu')" style="display:none;" class="btn-danger">TERMINAR PARTIDA</button>
         </div>
 
         <div id="pais-game" class="screen">
-            <h2>🌍 El País es...</h2>
-            <div class="role-box" id="nombre-pais" style="color: var(--success);">???</div>
-            <button onclick="generarPais()">Nuevo País</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al Menú</button>
+            <h2>🌍 EL PAÍS ES...</h2>
+            <div class="role-box" id="nombre-pais" style="color: var(--text); border-style: solid; border-color: var(--button);">???</div>
+            <button onclick="generarPais()">NUEVO PAÍS</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER AL MENÚ</button>
         </div>
 
     </div>
 
     <script>
-        // NAVEGACIÓN
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // MAZO DE 200 PAREJAS (RESUMIDO AQUÍ POR ESPACIO, PERO CON LA LÓGICA GENERAL)
         const mazoPalabras = [
             { tripulante: "iPhone", impostor: "Tecnología" }, { tripulante: "Microondas", impostor: "Electrodoméstico" },
             { tripulante: "Taller", impostor: "Tere" },{ tripulante: "Esponjita", impostor: "Bolea" },
             { tripulante: "Lavadora", impostor: "Lucía" },{ tripulante: "Café", impostor: "Bala" },
             { tripulante: "Domingo", impostor: "Mc Flurry" },{ tripulante: "Elfo", impostor: "Navidad" },
-            { tripulante: "Mary Shelley", impostor: "Terror" },{ tripulante: "Microondas", impostor: "Electrodoméstico" },
+            { tripulante: "Mary Shelley", impostor: "Terror" },
             { tripulante: "Taladro", impostor: "Herramienta" }, { tripulante: "Calculadora", impostor: "Matemáticas" },
             { tripulante: "Satélite", impostor: "Espacio" }, { tripulante: "Dron", impostor: "Vuelo" },
             { tripulante: "Cámara", impostor: "Imagen" }, { tripulante: "Impresora", impostor: "Oficina" },
@@ -156,9 +174,6 @@
             { tripulante: "Navidad", impostor: "Invierno" }, { tripulante: "Verano", impostor: "Estación" },
             { tripulante: "Corazón", impostor: "Persona" }, { tripulante: "Mano", impostor: "Guante" },
             { tripulante: "Zapatos", impostor: "Ropa" }, { tripulante: "Oro", impostor: "Rico" },
-            // CONCEPTOS ABSTRACTOS
-            { tripulante: "Lunes", impostor: "Tiempo" }, { tripulante: "Enero", impostor: "Frío" },
-            { tripulante: "Navidad", impostor: "Fiesta" }, { tripulante: "Verano", impostor: "Calor" },
             { tripulante: "Amor", impostor: "Sentimiento" }, { tripulante: "Miedo", impostor: "Emoción" },
             { tripulante: "Dólar", impostor: "Moneda" }, { tripulante: "Cero", impostor: "Número" },
             { tripulante: "Triángulo", impostor: "Forma" }, { tripulante: "Rojo", impostor: "Color" },
@@ -167,7 +182,6 @@
             { tripulante: "Boda", impostor: "Celebración" }, { tripulante: "Guerra", impostor: "Conflicto" },
             { tripulante: "Paz", impostor: "Símbolo" }, { tripulante: "Música", impostor: "Sonido" },
             { tripulante: "Poesía", impostor: "Literatura" }, { tripulante: "Hambre", impostor: "Sensación" }
-            // Nota: Puedes seguir añadiendo más aquí siguiendo el formato.
         ];
 
         let jugadores = [];
@@ -181,9 +195,9 @@
             jugadores = [];
             for (let i = 0; i < n; i++) {
                 if (i === parseInt(impostorIdx)) {
-                    jugadores.push("🕵️ Tu pista es:\n" + pareja.impostor.toUpperCase());
+                    jugadores.push("🕵️ TU PISTA ES:\n" + pareja.impostor.toUpperCase());
                 } else {
-                    jugadores.push("✅ Tu palabra es:\n" + pareja.tripulante.toUpperCase());
+                    jugadores.push("✅ TU PALABRA ES:\n" + pareja.tripulante.toUpperCase());
                 }
             }
             indiceActual = 0;
@@ -194,11 +208,11 @@
         }
 
         function prepararTurno() {
-            document.getElementById('turno-de').innerText = "Jugador " + (indiceActual + 1);
+            document.getElementById('turno-de').innerText = "JUGADOR " + (indiceActual + 1);
             const display = document.getElementById('role-display');
             display.style.display = "none";
-            display.style.borderColor = "#333";
-            display.style.color = "white";
+            display.style.borderColor = "#e2e8f0";
+            display.style.color = "var(--text)";
             document.getElementById('btn-revelar').style.display = "block";
             document.getElementById('btn-siguiente').style.display = "none";
         }
@@ -209,8 +223,7 @@
             display.innerText = contenido;
             display.style.display = "flex";
             
-            // Cambio de color visual según rol
-            if (contenido.includes("IMPOSTOR")) {
+            if (contenido.includes("🕵️")) {
                 display.style.borderColor = "var(--danger)";
                 display.style.color = "var(--danger)";
             } else {
@@ -237,9 +250,8 @@
             }
         }
 
-        // LÓGICA PAÍS (Lista Completa)
         function generarPais() {
-            const paises = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Antigua y Barbuda", "Arabia Saudita", "Argelia", "Argentina", "Armenia", "Australia", "Austria", "Azerbaiyán", "Bahamas", "Bangladés", "Barbados", "Baréin", "Bélgica", "Belice", "Benín", "Bielorrusia", "Birmania", "Bolivia", "Bosnia y Herzegovina", "Botsuana", "Brasil", "Brunéi", "Bulgaria", "Burquina Faso", "Burundi", "Bután", "Cabo Verde", "Camboya", "Camerún", "Canadá", "Catar", "Chad", "Chile", "China", "Chipre", "Ciudad del Vaticano", "Colombia", "Comoras", "Corea del Norte", "Corea del Sur", "Costa de Marfil", "Costa Rica", "Croacia", "Cuba", "Dinamarca", "Dominica", "Ecuador", "Egipto", "El Salvador", "Emiratos Árabes Unidos", "Eritrea", "Eslovaquia", "Eslovenia", "España", "Estados Unidos", "Estonia", "Etiopía", "Filipinas", "Finlandia", "Fiyi", "Francia", "Gabón", "Gambia", "Georgia", "Ghana", "Granada", "Grecia", "Guatemala", "Guinea", "Guinea-Bisáu", "Guinea Ecuatorial", "Guyana", "Haití", "Honduras", "Hungría", "India", "Indonesia", "Irak", "Irán", "Irlanda", "Islandia", "Islas Marshall", "Islas Salomón", "Israel", "Italia", "Jamaica", "Japón", "Jordania", "Kazajistán", "Kenia", "Kirguistán", "Kiribati", "Kuwait", "Laos", "Lesoto", "Letonia", "Líbano", "Liberia", "Libia", "Liechtenstein", "Lituania", "Luxemburgo", "Macedonia del Norte", "Madagascar", "Malasia", "Malaui", "Maldivas", "Malí", "Malta", "Marruecos", "Mauricio", "Mauritania", "México", "Micronesia", "Moldavia", "Mónaco", "Mongolia", "Montenegro", "Mozambique", "Namibia", "Nauru", "Nepal", "Nicaragua", "Níger", "Nigeria", "Noruega", "Nueva Zelanda", "Omán", "Países Bajos", "Pakistán", "Palaos", "Panamá", "Papúa Nueva Guinea", "Paraguay", "Perú", "Polonia", "Portugal", "Reino Unido", "República Centroafricana", "República Checa", "República del Congo", "República Democrática del Congo", "República Dominicana", "Ruanda", "Rumania", "Rusia", "Samoa", "San Cristóbal y Nieves", "San Marino", "San Vicente y las Granadinas", "Santa Lucía", "Santo Tomé y Príncipe", "Senegal", "Serbia", "Seychelles", "Sierra Leona", "Singapur", "Siria", "Somalia", "Sri Lanka", "Sudáfrica", "Sudán", "Sudán del Sur", "Suecia", "Suiza", "Surinam", "Tailandia", "Taiwán", "Tanzania", "Tayikistán", "Timor Oriental", "Togo", "Tonga", "Trinidad y Tobago", "Túnez", "Turkmenistán", "Turquía", "Tuvalu", "Ucrania", "Uganda", "Uruguay", "Uzbekistán", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Yibuti", "Zambia", "Zimbabue"];
+            const paises = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Argelia", "Argentina", "Australia", "Austria", "Bélgica", "Bolivia", "Brasil", "Canadá", "Chile", "China", "Colombia", "Corea del Sur", "Costa de Marfil", "Costa Rica", "Croacia", "Cuba", "Dinamarca", "Ecuador", "Egipto", "El Salvador", "España", "Estados Unidos", "Filipinas", "Finlandia", "Francia", "Grecia", "Guatemala", "Haití", "Honduras", "Hungría", "India", "Indonesia", "Irak", "Irán", "Irlanda", "Islandia", "Israel", "Italia", "Jamaica", "Japón", "Jordania", "Marruecos", "México", "Noruega", "Nueva Zelanda", "Países Bajos", "Panamá", "Paraguay", "Perú", "Polonia", "Portugal", "Reino Unido", "Rusia", "Senegal", "Serbia", "Singapur", "Siria", "Sudáfrica", "Suecia", "Suiza", "Tailandia", "Turquía", "Ucrania", "Uruguay", "Venezuela", "Vietnam"];
             const p = paises[Math.floor(Math.random() * paises.length)];
             document.getElementById('nombre-pais').innerText = p;
         }
