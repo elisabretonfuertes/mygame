@@ -35,11 +35,11 @@
             background: var(--card);
             padding: 2.5rem 1.5rem;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04); /* Sombra muy suave */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
         }
 
         /* TÍTULOS EN ROSA */
-        h1, h2 { 
+        h1, h2, h3 { 
             color: var(--accent); 
             margin-bottom: 1.5rem;
             font-weight: 800;
@@ -70,8 +70,9 @@
 
         .btn-secondary { background: var(--secondary); box-shadow: none; }
         .btn-danger { background: var(--danger); box-shadow: none; }
+        .btn-success { background: var(--success); box-shadow: none; }
 
-        /* CAJA DE ROL REVELADO */
+        /* CAJA DE ROL / TEXTO */
         .role-box {
             white-space: pre-line;
             background: #f1f5f9; /* Fondo gris claro */
@@ -81,7 +82,7 @@
             font-size: 1.5rem;
             font-weight: bold;
             min-height: 80px;
-            border: 3px dashed #e2e8f0; /* Borde discontinuo moderno */
+            border: 3px dashed #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -103,8 +104,40 @@
         }
 
         input:focus { border-color: var(--accent); }
-
         p { color: #64748b; font-weight: 500; }
+
+        /* ESTILOS NUEVOS PARA HEDBANZ (RULETA) */
+        .timer {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--danger);
+            margin: 10px 0;
+        }
+
+        .cat-container {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cat-tag {
+            background: #f1f5f9;
+            border: 2px solid var(--accent);
+            color: var(--text);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .big-word {
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            color: var(--text);
+        }
     </style>
 </head>
 <body>
@@ -115,6 +148,7 @@
             <h1>🎮 A CORRER LOS LAKERSS!</h1>
             <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
             <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
+            <button onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
         </div>
 
         <div id="impostor-config" class="screen">
@@ -141,14 +175,187 @@
             <button class="btn-secondary" onclick="showScreen('menu')">VOLVER AL MENÚ</button>
         </div>
 
+        <div id="ruleta-setup" class="screen">
+            <h2>🎡 HEDBANZ</h2>
+            <p>Tendréis 2 minutos para adivinar palabras de 3 categorías aleatorias.</p>
+            <button onclick="prepararHedbanz()">¡GIRAR Y EMPEZAR!</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
+        </div>
+
+        <div id="ruleta-active" class="screen">
+            <div class="timer" id="timer">02:00</div>
+            <div class="cat-container" id="cats-display"></div>
+            <p style="margin: 5px 0;">Adivinadas: <strong id="score-val" style="font-size:1.2rem; color:var(--text)">0</strong></p>
+            
+            <div class="role-box big-word" id="current-word-display" style="border-color: var(--button); min-height: 120px;">
+                ---
+            </div>
+
+            <button class="btn-success" onclick="palabraAcertada()">✅ ¡ADIVINADA!</button>
+            <button class="btn-secondary" onclick="siguientePalabraRuleta()">⏭️ PASAR</button>
+        </div>
+
+        <div id="ruleta-results" class="screen">
+            <h2>¡TIEMPO AGOTADO!</h2>
+            <p>Total de palabras adivinadas:</p>
+            <div class="role-box" id="final-score" style="border-color: var(--accent); color: var(--accent); font-size: 3rem;">0</div>
+            <button onclick="showScreen('menu')">VOLVER AL INICIO</button>
+        </div>
     </div>
 
     <script>
+        // --- NAVEGACIÓN ---
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            // Si salimos de la ruleta, parar el contador por si acaso
+            if (id !== 'ruleta-active') clearInterval(timerInterval);
         }
 
+        // --- DATOS RULETA / HEDBANZ ---
+        const categoriasData = {
+            "Comida": [
+                "Pizza", "Sushi", "Hamburguesa", "Paella", "Hamburguesa", "Pasta", "Lasaña", "Canelones", "Ramen", "Filete",
+                "Croqueta", "Tortilla", "Chuletón", "Salmorejo", "Guacamole", "Risotto", "Falafel", "Kebab", "Hummus", "Burrito",
+                "Poke", "Tiramisú", "Brownie", "Gazpacho", "Hot Dog", "Nuggets", "Donut", "Lechuga",
+                "Macarrones", "Ensaladilla", "Pancakes", "Mc Flurry", "Bacalao", "Sopa", "Tarta"
+            ],
+            "Cine": [
+                "Star Wars", "Titanic", "Avatar", "Shrek", "Joker", "Batman", "Inception", "Matrix", "Alien", "Jaws",
+                "Frozen", "Ratatouille", "Gladiator", "Coco", "Up", "Toy Story", "Casablanca", "Psicosis", "Godfather", "Pulp Fiction",
+                "Avengers", "Iron Man", "Harry Potter", "Spider-Man", "Jurassic Park", "Indiana Jones", "Rocky", "Rambo", "Terminator", "Grease",
+                "Dumbo", "Bambi", "Mulan", "Tarzán", "Cars", "Soul", "Saw", "It", "Scream", "Barbie"
+            ],
+            "Deportes": [
+                "Tenis", "Golf", "Boxeo", "Rugby", "Natación", "Esquí", "Fútbol", "Baloncesto", "Voleibol", "Balonmano",
+                "Atletismo", "Ciclismo", "Surf", "Skate", "Pádel", "Béisbol", "Hockey", "Esgrima", "Judo", "Karate",
+                "Yoga", "Pilates", "Crossfit", "Ajedrez", "Dardos", "Billar", "Ping Pong", "Waterpolo", "Remo", "Vela",
+                "Escalada", "Senderismo", "Triatlón", "Maratón", "Fórmula 1", "Motociclismo", "Bádminton", "Gimnasia"
+            ],
+            "Animales": [
+                "Elefante", "Jirafa", "Pingüino", "Canguro", "Pulpo", "Lobo", "León", "Tigre", "Oso", "Cebra",
+                "Delfín", "Ballena", "Tiburón", "Águila", "Loro", "Búho", "Serpiente", "Cocodrilo", "Tortuga", "Rana",
+                "Caballo", "Vaca", "Cerdo", "Oveja", "Gallina", "Conejo", "Ardilla", "Zorro", "Mono", "Gorila",
+                "Panda", "Koala", "Camello", "Hipopótamo", "Rinoceronte", "Guepardo", "Hiena", "Mapache", "Murciélago", "Medusa"
+            ],
+            "Lugares": [
+                "Playa", "Montaña", "Desierto", "Selva", "Aeropuerto", "Cárcel", "Hospital", "Escuela", "Iglesia", "Museo",
+                "Cine", "Teatro", "Estadio", "Gimnasio", "Biblioteca", "Zoo", "Parque", "Plaza", "Castillo", "Faro",
+                "Puerto", "Estación", "Metro", "Banco", "Supermercado", "Farmacia", "Hotel", "Restaurante", "Discoteca", "Casino",
+                "Pueblo", "Ciudad", "Isla", "Volcán", "Cueva", "Pantano", "Rascacielos", "Puente", "Cementerio", "Circo"
+            ],
+            "Objetos": [
+                "Paraguas", "Telescopio", "Guitarra", "Espejo", "Taladro", "Reloj", "Llave", "Martillo", "Cuchara", "Tenedor",
+                "Cuchillo", "Plato", "Vaso", "Sartén", "Nevera", "Horno", "Escoba", "Cubo", "Fregona", "Móvil",
+                "Ordenador", "Ratón", "Teclado", "Pantalla", "Altavoz", "Cámara", "Libro", "Bolígrafo", "Lápiz", "Goma",
+                "Tijeras", "Pegamento", "Maleta", "Mochila", "Cartera", "Moneda", "Billete", "Gafas", "Casco", "Linterna"
+            ],
+            "Marcas": [
+                "Nike", "Apple", "Coca-Cola", "Disney", "Tesla", "Google", "Adidas", "Puma", "Reebok", "Zara",
+                "Amazon", "Facebook", "Instagram", "Netflix", "Spotify", "Microsoft", "Samsung", "Sony", "Nintendo", "Toyota",
+                "Mercedes", "Ferrari", "BMW", "Audi", "IKEA", "McDonalds", "Burger King", "Starbucks", "Pepsi", "Red Bull",
+                "Lego", "Mattel", "Hasbro", "Gucci", "Prada", "Chanel", "Rolex", "Visa", "Paypal", "Uber"
+            ],
+            "Personajes": [
+                "Spider-Man", "Messi", "Mickey Mouse", "Doraemon", "Pikachu", "Hulk", "Batman", "Superman", "Wonder Woman", "Thor",
+                "Iron Man", "Capitán América", "Black Widow", "Loki", "Yoda", "Darth Vader", "Harry Potter", "Hermione", "Voldemort", "Gandalf",
+                "Frodo", "Sherlock Holmes", "Jack Sparrow", "James Bond", "Indiana Jones", "Lara Croft", "Mario", "Luigi", "Donkey Kong", "Sonic",
+                "Cristiano Ronaldo", "Rafa Nadal", "Pau Gasol", "Michael Jordan", "LeBron James", "Elon Musk", "Bill Gates", "Steve Jobs", "Zuckerberg", "Beyoncé"
+            ],
+            "Acciones": [
+                "Bailar", "Cocinando", "Escalando", "Durmiendo", "Llorando", "Correr", "Saltar", "Cantar", "Reír", "Gritar",
+                "Nadar", "Volar", "Conducir", "Dibujar", "Escribir", "Leer", "Comer", "Beber", "Estudiar", "Trabajar",
+                "Pelear", "Besar", "Abrazar", "Pasear", "Viajar", "Comprar", "Vender", "Limpiar", "Pintar", "Construir",
+                "Destruir", "Cazar", "Pescar", "Sembrar", "Regar", "Afeitar", "Peinar", "Vestir", "Mirar", "Escuchar"
+            ],
+            "Gimnasio": [
+                "Mancuerna", "Press de Banca", "Sentadilla", "Proteína", "Creatina", "Cinta de Correr", "Monitor", "Abdominales", "Bíceps", "Tríceps",
+                "Dominadas", "Peso Muerto", "Zancadas", "Burpees", "Spinning", "Cinturón", "Polea", "Elíptica",
+                "Remo", "Plancha", "Crossfit", "Entrenador", "Toalla", "Series", "Repeticiones",
+                "Cardio", "Estiramientos", "Glúteo", "Cuádriceps", "Hombros", "Prensa", "Barra Olímpica", "Discos"
+            ],
+            "Música": [
+                "Rock", "Reggaeton", "Piano", "Concierto", "Rap", "Batería", "Público", "Guitarra", "Violín", "Flauta",
+                "Trompeta", "Saxofón", "Canto", "Coro", "Ópera", "Jazz", "Pop", "Heavy Metal", "Trap", "Flamenco",
+                "Salsa", "Bachata", "Merengue", "Tango", "Blues", "Soul", "Funk", "Techno", "House",
+                "Festival", "Escenario", "Micrófono", "Auriculares", "Vinilo", "Casete", "CD", "Radio", "Partitura", "Ritmo"
+            ]
+        };
+
+        // --- VARIABLES LÓGICA HEDBANZ ---
+        let poolPalabrasRuleta = [];
+        let ruletaScore = 0;
+        let timerInterval;
+
+        function prepararHedbanz() {
+            const llaves = Object.keys(categoriasData);
+            // 1. Elegir 3 categorías
+            const elegidas = [];
+            while(elegidas.length < 3) {
+                let cat = llaves[Math.floor(Math.random() * llaves.length)];
+                if(!elegidas.includes(cat)) elegidas.push(cat);
+            }
+
+            // Mostrar categorías
+            const catsDisplay = document.getElementById('cats-display');
+            catsDisplay.innerHTML = elegidas.map(c => `<span class="cat-tag">${c}</span>`).join("");
+
+            // 2. Crear bolsa de palabras
+            poolPalabrasRuleta = [];
+            elegidas.forEach(c => {
+                poolPalabrasRuleta = poolPalabrasRuleta.concat(categoriasData[c]);
+            });
+            // Mezclar
+            poolPalabrasRuleta.sort(() => Math.random() - 0.5);
+
+            // Reiniciar estado
+            ruletaScore = 0;
+            document.getElementById('score-val').innerText = "0";
+            
+            showScreen('ruleta-active');
+            siguientePalabraRuleta();
+            iniciarContador(120); // 2 minutos
+        }
+
+        function iniciarContador(segundos) {
+            const timerEl = document.getElementById('timer');
+            let restante = segundos;
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                let m = Math.floor(restante / 60);
+                let s = restante % 60;
+                timerEl.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+                if (restante <= 0) {
+                    finalizarHedbanz();
+                }
+                restante--;
+            }, 1000);
+        }
+
+        function siguientePalabraRuleta() {
+            if (poolPalabrasRuleta.length > 0) {
+                const p = poolPalabrasRuleta.pop();
+                document.getElementById('current-word-display').innerText = p;
+            } else {
+                finalizarHedbanz();
+            }
+        }
+
+        function palabraAcertada() {
+            ruletaScore++;
+            document.getElementById('score-val').innerText = ruletaScore;
+            siguientePalabraRuleta();
+        }
+
+        function finalizarHedbanz() {
+            clearInterval(timerInterval);
+            document.getElementById('final-score').innerText = ruletaScore;
+            showScreen('ruleta-results');
+        }
+
+        // --- DATOS IMPOSTOR ---
         const mazoPalabras = [
             { tripulante: "iPhone", impostor: "Tecnología" }, { tripulante: "Microondas", impostor: "Electrodoméstico" },
             { tripulante: "Taller", impostor: "Tere" },{ tripulante: "Esponjita", impostor: "Bolea" },
@@ -187,6 +394,7 @@
         let jugadores = [];
         let indiceActual = 0;
 
+        // --- LÓGICA IMPOSTOR ---
         function iniciarImpostor() {
             const n = document.getElementById('num-jugadores').value;
             const impostorIdx = Math.floor(Math.random() * n);
@@ -250,10 +458,11 @@
             }
         }
 
+        // --- LÓGICA PAÍS ---
         function generarPais() {
             const paises = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Argelia", "Argentina", "Australia", "Austria", "Bélgica", "Bolivia", "Brasil", "Canadá", "Chile", "China", "Colombia", "Corea del Sur", "Costa de Marfil", "Costa Rica", "Croacia", "Cuba", "Dinamarca", "Ecuador", "Egipto", "El Salvador", "España", "Estados Unidos", "Filipinas", "Finlandia", "Francia", "Grecia", "Guatemala", "Haití", "Honduras", "Hungría", "India", "Indonesia", "Irak", "Irán", "Irlanda", "Islandia", "Israel", "Italia", "Jamaica", "Japón", "Jordania", "Marruecos", "México", "Noruega", "Nueva Zelanda", "Países Bajos", "Panamá", "Paraguay", "Perú", "Polonia", "Portugal", "Reino Unido", "Rusia", "Senegal", "Serbia", "Singapur", "Siria", "Sudáfrica", "Suecia", "Suiza", "Tailandia", "Turquía", "Ucrania", "Uruguay", "Venezuela", "Vietnam"];
             const p = paises[Math.floor(Math.random() * paises.length)];
-            document.getElementById('nombre-pais').innerText = p;
+            document.getElementById('nombre-pais').innerText = p.toUpperCase();
         }
     </script>
 </body>
