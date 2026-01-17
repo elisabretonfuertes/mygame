@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub - Juego de Mesa</title>
+    <title>Game Hub - Lakerss</title>
     <style>
-        /* CSS: Estética Clara y Rosa (Light Mode) */
+        /* CSS: Estética Elegante (Dark Navy & Gold) */
         :root {
-            --bg: #f8fafc;         /* Fondo gris casi blanco */
-            --card: #ffffff;       /* Contenedor blanco puro */
-            --accent: #ec4899;     /* Rosa vibrante para títulos */
-            --text: #1e293b;       /* Texto oscuro para lectura clara */
-            --button: #f472b6;     /* Rosa suave para botones */
-            --danger: #ef4444;     /* Rojo para el Impostor */
-            --success: #10b981;    /* Verde para Tripulante */
-            --secondary: #94a3b8;  /* Gris para botones secundarios */
+            --bg: #000042;         /* Fondo Azul Marino Profundo */
+            --card: #050552;       /* Un tono ligeramente más claro para la tarjeta */
+            --accent: #efe1a7;     /* Dorado Pálido para textos y bordes */
+            --text: #efe1a7;       /* Texto Dorado */
+            --button: #efe1a7;     /* Botones Dorados */
+            --button-text: #000042;/* Texto dentro de los botones (oscuro para contraste) */
+            
+            /* Colores de estado ajustados para fondo oscuro */
+            --danger: #ff6b6b;     /* Rojo brillante */
+            --success: #4ade80;    /* Verde neón suave */
+            --secondary: #334155;  /* Gris azulado oscuro para botones secundarios */
         }
 
         body {
@@ -35,54 +38,73 @@
             background: var(--card);
             padding: 2.5rem 1.5rem;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            /* Sombra sutil y borde dorado fino */
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(239, 225, 167, 0.3);
         }
 
-        /* TÍTULOS EN ROSA */
+        /* TÍTULOS EN DORADO */
         h1, h2, h3 { 
             color: var(--accent); 
             margin-bottom: 1.5rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .screen { display: none; }
         .active { display: block; }
 
-        /* BOTONES EN ROSA */
+        /* BOTONES (Fondo Dorado, Texto Azul) */
         button {
             background: var(--button);
-            color: white;
+            color: var(--button-text); /* Texto oscuro para que se lea sobre dorado */
             border: none;
             padding: 16px 25px;
             border-radius: 14px;
-            font-weight: bold;
+            font-weight: 900; /* Más negrita */
             font-size: 1rem;
             width: 100%;
             margin: 10px 0;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.2);
+            box-shadow: 0 4px 15px rgba(239, 225, 167, 0.2);
+            text-transform: uppercase;
         }
 
         button:active { transform: scale(0.96); }
 
-        .btn-secondary { background: var(--secondary); box-shadow: none; }
-        .btn-danger { background: var(--danger); box-shadow: none; }
-        .btn-success { background: var(--success); box-shadow: none; }
+        /* Botones secundarios (Volver, Pasar) */
+        .btn-secondary { 
+            background: transparent; 
+            border: 2px solid var(--secondary); 
+            color: #94a3b8; 
+            box-shadow: none; 
+        }
+        
+        .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3); }
+        .btn-success { background: var(--success); color: #064e3b; box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3); }
+        
+        /* Botón especial para Café o Té (Un dorado más oscuro o borde) */
+        .btn-gold-dark { 
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            box-shadow: 0 4px 12px rgba(239, 225, 167, 0.1);
+        } 
 
         /* CAJA DE ROL / TEXTO */
         .role-box {
             white-space: pre-line;
-            background: #f1f5f9; /* Fondo gris claro */
+            background: rgba(0, 0, 0, 0.2); /* Fondo semitransparente oscuro */
             padding: 35px 20px;
             margin: 20px 0;
             border-radius: 20px;
             font-size: 1.5rem;
             font-weight: bold;
             min-height: 80px;
-            border: 3px dashed #e2e8f0;
+            border: 2px dashed var(--accent); /* Borde discontinuo dorado */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -90,28 +112,34 @@
             color: var(--text);
         }
 
+        /* INPUTS */
         input {
             width: 70%;
             padding: 14px;
             border-radius: 12px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--accent);
             margin-bottom: 20px;
             text-align: center;
             font-size: 1.3rem;
-            color: var(--text);
+            color: var(--accent); /* Texto dorado al escribir */
             outline: none;
-            background: white;
+            background: rgba(255, 255, 255, 0.05); /* Fondo muy sutil */
         }
 
-        input:focus { border-color: var(--accent); }
-        p { color: #64748b; font-weight: 500; }
+        input:focus { 
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(239, 225, 167, 0.2); 
+        }
 
-        /* ESTILOS NUEVOS PARA HEDBANZ (RULETA) */
+        p { color: #cbd5e1; font-weight: 400; } /* Un gris muy claro para párrafos */
+
+        /* ESTILOS ESPECÍFICOS HEDBANZ (RULETA) */
         .timer {
             font-size: 3rem;
             font-weight: 900;
             color: var(--danger);
             margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
         }
 
         .cat-container {
@@ -123,9 +151,9 @@
         }
 
         .cat-tag {
-            background: #f1f5f9;
-            border: 2px solid var(--accent);
-            color: var(--text);
+            background: rgba(239, 225, 167, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 0.8rem;
@@ -136,7 +164,17 @@
             font-size: 2.2rem;
             text-transform: uppercase;
             font-weight: 900;
-            color: var(--text);
+            color: var(--accent);
+        }
+
+        /* ESTILOS ESPECÍFICOS CAFÉ O TÉ */
+        .counter-big {
+            font-size: 6rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin: 0;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(239, 225, 167, 0.2);
         }
     </style>
 </head>
@@ -149,6 +187,7 @@
             <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
             <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
             <button onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
+            <button onclick="showScreen('cafe-setup')" class="btn-gold-dark">☕ Café o Té</button>
         </div>
 
         <div id="impostor-config" class="screen">
@@ -170,7 +209,7 @@
 
         <div id="pais-game" class="screen">
             <h2>🌍 EL PAÍS ES...</h2>
-            <div class="role-box" id="nombre-pais" style="color: var(--text); border-style: solid; border-color: var(--button);">???</div>
+            <div class="role-box" id="nombre-pais" style="color: var(--accent); border-style: solid; border-color: var(--accent);">???</div>
             <button onclick="generarPais()">NUEVO PAÍS</button>
             <button class="btn-secondary" onclick="showScreen('menu')">VOLVER AL MENÚ</button>
         </div>
@@ -185,9 +224,9 @@
         <div id="ruleta-active" class="screen">
             <div class="timer" id="timer">02:00</div>
             <div class="cat-container" id="cats-display"></div>
-            <p style="margin: 5px 0;">Adivinadas: <strong id="score-val" style="font-size:1.2rem; color:var(--text)">0</strong></p>
+            <p style="margin: 5px 0;">Adivinadas: <strong id="score-val" style="font-size:1.2rem; color:var(--accent)">0</strong></p>
             
-            <div class="role-box big-word" id="current-word-display" style="border-color: var(--button); min-height: 120px;">
+            <div class="role-box big-word" id="current-word-display" style="border-color: var(--accent); min-height: 120px;">
                 ---
             </div>
 
@@ -201,6 +240,26 @@
             <div class="role-box" id="final-score" style="border-color: var(--accent); color: var(--accent); font-size: 3rem;">0</div>
             <button onclick="showScreen('menu')">VOLVER AL INICIO</button>
         </div>
+
+        <div id="cafe-setup" class="screen">
+            <h2>☕ CAFÉ O TÉ</h2>
+            <p>Tenéis <strong>20 palabras</strong> (en total) para que adivinen el objeto.</p>
+            <button onclick="iniciarCafe()">¡SACAR PALABRA!</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
+        </div>
+
+        <div id="cafe-play" class="screen">
+            <p>Palabra secreta:</p>
+            <div class="role-box" id="cafe-word" style="font-size: 2rem; color: var(--accent); border-color: var(--accent); margin: 10px 0;">---</div>
+            
+            <p>Palabras restantes:</p>
+            <div class="counter-big" id="cafe-counter">20</div>
+            
+            <button onclick="restarPalabraCafe()" id="btn-restar-cafe" class="btn-gold-dark" style="margin-top: 20px;">➖ GASTAR PALABRA</button>
+            <button class="btn-success" onclick="showScreen('menu')">🎉 ¡ACERTADA!</button>
+            <button class="btn-secondary" onclick="iniciarCafe()">⏭️ SIGUIENTE PALABRA</button>
+        </div>
+
     </div>
 
     <script>
@@ -208,7 +267,6 @@
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            // Si salimos de la ruleta, parar el contador por si acaso
             if (id !== 'ruleta-active') clearInterval(timerInterval);
         }
 
@@ -289,32 +347,27 @@
 
         function prepararHedbanz() {
             const llaves = Object.keys(categoriasData);
-            // 1. Elegir 3 categorías
             const elegidas = [];
             while(elegidas.length < 3) {
                 let cat = llaves[Math.floor(Math.random() * llaves.length)];
                 if(!elegidas.includes(cat)) elegidas.push(cat);
             }
 
-            // Mostrar categorías
             const catsDisplay = document.getElementById('cats-display');
             catsDisplay.innerHTML = elegidas.map(c => `<span class="cat-tag">${c}</span>`).join("");
 
-            // 2. Crear bolsa de palabras
             poolPalabrasRuleta = [];
             elegidas.forEach(c => {
                 poolPalabrasRuleta = poolPalabrasRuleta.concat(categoriasData[c]);
             });
-            // Mezclar
             poolPalabrasRuleta.sort(() => Math.random() - 0.5);
 
-            // Reiniciar estado
             ruletaScore = 0;
             document.getElementById('score-val').innerText = "0";
             
             showScreen('ruleta-active');
             siguientePalabraRuleta();
-            iniciarContador(120); // 2 minutos
+            iniciarContador(120);
         }
 
         function iniciarContador(segundos) {
@@ -394,7 +447,6 @@
         let jugadores = [];
         let indiceActual = 0;
 
-        // --- LÓGICA IMPOSTOR ---
         function iniciarImpostor() {
             const n = document.getElementById('num-jugadores').value;
             const impostorIdx = Math.floor(Math.random() * n);
@@ -419,7 +471,7 @@
             document.getElementById('turno-de').innerText = "JUGADOR " + (indiceActual + 1);
             const display = document.getElementById('role-display');
             display.style.display = "none";
-            display.style.borderColor = "#e2e8f0";
+            display.style.borderColor = "#efe1a7"; /* Borde neutral dorado */
             display.style.color = "var(--text)";
             document.getElementById('btn-revelar').style.display = "block";
             document.getElementById('btn-siguiente').style.display = "none";
@@ -464,7 +516,54 @@
             const p = paises[Math.floor(Math.random() * paises.length)];
             document.getElementById('nombre-pais').innerText = p.toUpperCase();
         }
+
+        // --- LÓGICA CAFÉ O TÉ ---
+        const palabrasCafeTe = [
+            "Cepillo de dientes", "Ventilador", "Calcetín", "Mando a distancia", 
+            "Gorra", "Botella", "Cojín", "Toalla", "Llaves", "Cuaderno",
+            "Mochila", "Cargador", "Microondas", "Maceta", "Silla", "Mesa",
+            "Lámpara", "Alfombra", "Espejo", "Perfume", "Cinturón",
+            "Servilleta", "Bicicleta", "Monedero", "Anillo", "Collar",
+            "Pendientes", "Zapatilla", "Bolsa", "Papelera"
+        ];
+        
+        let contadorCafe = 20;
+
+        function iniciarCafe() {
+            contadorCafe = 20;
+            actualizarContadorUI();
+            
+            document.getElementById('btn-restar-cafe').disabled = false;
+            document.getElementById('btn-restar-cafe').style.opacity = "1";
+
+            const palabra = palabrasCafeTe[Math.floor(Math.random() * palabrasCafeTe.length)];
+            document.getElementById('cafe-word').innerText = palabra.toUpperCase();
+            
+            showScreen('cafe-play');
+        }
+
+        function restarPalabraCafe() {
+            if(contadorCafe > 0) {
+                contadorCafe--;
+                actualizarContadorUI();
+            }
+            
+            if(contadorCafe === 0) {
+                document.getElementById('btn-restar-cafe').disabled = true;
+                document.getElementById('btn-restar-cafe').style.opacity = "0.5";
+                alert("¡Se acabaron las palabras!");
+            }
+        }
+
+        function actualizarContadorUI() {
+            const el = document.getElementById('cafe-counter');
+            el.innerText = contadorCafe;
+            if(contadorCafe <= 5) {
+                el.style.color = "var(--danger)";
+            } else {
+                el.style.color = "var(--accent)";
+            }
+        }
     </script>
 </body>
 </html>
-
