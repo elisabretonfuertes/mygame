@@ -34,14 +34,20 @@
 
         .container {
             width: 90%;
-            max-width: 450px;
+            max-width: 450px; /* Un poco más ancho para las imágenes */
             background: var(--card);
-            padding: 2rem 1.5rem;
+            padding: 2.5rem 1.5rem;
             border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             border: 1px solid rgba(239, 225, 167, 0.3);
-            margin: 20px;
+            max-height: 90vh;
+            overflow-y: auto; /* Scroll si es necesario */
         }
+
+        /* Scrollbar personalizada */
+        .container::-webkit-scrollbar { width: 8px; }
+        .container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+        .container::-webkit-scrollbar-track { background: transparent; }
 
         h1, h2, h3 { 
             color: var(--accent); 
@@ -52,16 +58,21 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .screen { display: none; }
+        .screen { display: none; animation: fadeIn 0.3s ease; }
         .active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         button {
             background: var(--button);
-            color: var(--button-text);
+            color: var(--button-text); 
             border: none;
             padding: 16px 25px;
             border-radius: 14px;
-            font-weight: 900;
+            font-weight: 900; 
             font-size: 1rem;
             width: 100%;
             margin: 10px 0;
@@ -83,6 +94,13 @@
         .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3); }
         .btn-success { background: var(--success); color: #064e3b; box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3); }
         
+        .btn-gold-dark { 
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            box-shadow: 0 4px 12px rgba(239, 225, 167, 0.1);
+        } 
+
         .role-box {
             white-space: pre-line;
             background: rgba(0, 0, 0, 0.2);
@@ -97,6 +115,7 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            color: var(--text);
         }
 
         input {
@@ -112,39 +131,42 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* ESTILOS ESPECÍFICOS */
+        p { color: #cbd5e1; font-weight: 400; }
+
+        /* Estilos Hedbanz & Dibujo */
         .timer {
             font-size: 3rem;
             font-weight: 900;
             color: var(--danger);
             margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
         }
 
-        .char-img-container {
+        .cat-container { display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .cat-tag { background: rgba(239, 225, 167, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        .big-word { font-size: 2.2rem; text-transform: uppercase; font-weight: 900; color: var(--accent); }
+
+        /* ESTILOS NUEVO JUEGO: DIBUJAR */
+        .char-image-container {
             width: 100%;
             height: 250px;
-            background: #fff;
+            background: rgba(255,255,255,0.05);
             border-radius: 15px;
-            margin-bottom: 15px;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 4px solid var(--accent);
+            margin-bottom: 15px;
+            border: 1px solid var(--accent);
+            overflow: hidden;
         }
-
-        .char-img-container img {
+        
+        .char-image-container img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
 
-        .counter-big {
-            font-size: 6rem;
-            font-weight: 900;
-            color: var(--accent);
-            line-height: 1;
-        }
+        .counter-big { font-size: 6rem; font-weight: 900; color: var(--accent); margin: 0; line-height: 1; text-shadow: 0 0 20px rgba(239, 225, 167, 0.2); }
     </style>
 </head>
 <body>
@@ -157,31 +179,30 @@
             <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
             <button onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
             <button onclick="showScreen('cafe-setup')">☕ Café o Té</button>
-            <button onclick="showScreen('paint-setup')" style="background: #fbbf24; color: #000;">🎨 Pinta el Personaje</button>
+            <button onclick="showScreen('dibujar-setup')">🎨 A Dibujar</button>
         </div>
 
-        <div id="paint-setup" class="screen">
-            <h2>🎨 PINTA EL DIBUJO</h2>
-            <p>Aparecerá un personaje de 2005-2015. Tienes <b>1 minuto</b> para dibujarlo lo mejor posible.</p>
-            <button onclick="iniciarPintar()">¡EMPEZAR YA!</button>
+        <div id="dibujar-setup" class="screen">
+            <h2>🎨 A DIBUJAR</h2>
+            <p>Aparecerá un personaje y su foto.</p>
+            <p>Tienes <strong>1 minuto</strong> para dibujarlo.</p>
+            <button onclick="iniciarJuegoDibujo()">¡EMPEZAR!</button>
             <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
-        <div id="paint-play" class="screen">
-            <div class="timer" id="paint-timer">01:00</div>
-            <div class="char-img-container">
-                <img id="char-photo" src="" alt="Cargando personaje...">
+        <div id="dibujar-play" class="screen">
+            <div class="timer" id="timer-dibujo">01:00</div>
+            
+            <div class="char-image-container">
+                <img id="img-personaje" src="" alt="Personaje a dibujar">
             </div>
-            <h3 id="char-name" style="margin-top: 0;">NOMBRE</h3>
-            <button class="btn-success" onclick="iniciarPintar()">⏭️ OTRO PERSONAJE</button>
-            <button class="btn-secondary" onclick="detenerPintar()">SALIR</button>
-        </div>
 
-        <div id="paint-finish" class="screen">
-            <h2>¡TIEMPO AGOTADO!</h2>
-            <p>¡Muestra tu obra de arte al resto!</p>
-            <button onclick="showScreen('paint-setup')">JUGAR OTRA VEZ</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">IR AL MENÚ</button>
+            <div class="role-box" id="nombre-personaje" style="min-height: auto; padding: 15px; margin-top: 0; font-size: 1.8rem;">
+                ---
+            </div>
+
+            <button onclick="siguientePersonajeDibujo()">🔄 SIGUIENTE PERSONAJE</button>
+            <button class="btn-secondary" onclick="detenerDibujo()">SALIR AL MENÚ</button>
         </div>
 
         <div id="impostor-config" class="screen">
@@ -210,7 +231,7 @@
 
         <div id="ruleta-setup" class="screen">
             <h2>🎡 HEDBANZ</h2>
-            <p>Tendréis 2 minutos para adivinar palabras.</p>
+            <p>Tendréis 2 minutos para adivinar palabras de 3 categorías aleatorias.</p>
             <button onclick="prepararHedbanz()">¡GIRAR Y EMPEZAR!</button>
             <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
@@ -218,188 +239,421 @@
         <div id="ruleta-active" class="screen">
             <div class="timer" id="timer">02:00</div>
             <div class="cat-container" id="cats-display"></div>
-            <p>Adivinadas: <strong id="score-val">0</strong></p>
-            <div class="role-box" id="current-word-display">---</div>
+            <p style="margin: 5px 0;">Adivinadas: <strong id="score-val" style="font-size:1.2rem; color:var(--accent)">0</strong></p>
+            
+            <div class="role-box big-word" id="current-word-display" style="border-color: var(--accent); min-height: 120px;">
+                ---
+            </div>
+
             <button class="btn-success" onclick="palabraAcertada()">✅ ¡ADIVINADA!</button>
             <button class="btn-secondary" onclick="siguientePalabraRuleta()">⏭️ PASAR</button>
         </div>
 
         <div id="ruleta-results" class="screen">
             <h2>¡TIEMPO AGOTADO!</h2>
-            <div class="role-box" id="final-score" style="font-size: 3rem;">0</div>
+            <p>Total de palabras adivinadas:</p>
+            <div class="role-box" id="final-score" style="border-color: var(--accent); color: var(--accent); font-size: 3rem;">0</div>
             <button onclick="showScreen('menu')">VOLVER AL INICIO</button>
         </div>
 
         <div id="cafe-setup" class="screen">
             <h2>☕ CAFÉ O TÉ</h2>
-            <p>Tenéis 20 palabras para adivinar el objeto.</p>
+            <p>Tenéis <strong>20 palabras</strong> (en total) para que adivinen el objeto.</p>
             <button onclick="iniciarCafe()">¡SACAR PALABRA!</button>
             <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
         <div id="cafe-play" class="screen">
-            <div class="role-box" id="cafe-word">---</div>
+            <p>Palabra secreta:</p>
+            <div class="role-box" id="cafe-word" style="font-size: 2rem; color: var(--accent); border-color: var(--accent); margin: 10px 0;">---</div>
+            
+            <p>Palabras restantes:</p>
             <div class="counter-big" id="cafe-counter">20</div>
-            <button onclick="restarPalabraCafe()" id="btn-restar-cafe" class="btn-gold-dark">➖ GASTAR PALABRA</button>
+            
+            <button onclick="restarPalabraCafe()" id="btn-restar-cafe" class="btn-gold-dark" style="margin-top: 20px;">➖ GASTAR PALABRA</button>
             <button class="btn-success" onclick="showScreen('menu')">🎉 ¡ACERTADA!</button>
-            <button class="btn-secondary" onclick="iniciarCafe()">⏭️ SIGUIENTE</button>
+            <button class="btn-secondary" onclick="iniciarCafe()">⏭️ SIGUIENTE PALABRA</button>
         </div>
 
     </div>
 
     <script>
-        // --- NAVEGACIÓN ---
+        // --- NAVEGACIÓN GLOBAL ---
+        let timerInterval;
+        let timerDibujoInterval;
+
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if (id !== 'ruleta-active' && id !== 'paint-play') {
-                clearInterval(timerInterval);
-                clearInterval(paintInterval);
-            }
+            
+            // Limpieza de timers al cambiar de pantalla
+            if (id !== 'ruleta-active') clearInterval(timerInterval);
+            if (id !== 'dibujar-play') clearInterval(timerDibujoInterval);
         }
 
-        // --- LÓGICA PINTA EL PERSONAJE ---
-        const personajesData = [
-            { n: "Finn el Humano", img: "https://upload.wikimedia.org/wikipedia/en/f/f3/Finn_the_Human.png" },
-            { n: "Po (Kung Fu Panda)", img: "https://upload.wikimedia.org/wikipedia/en/7/73/Po_from_Kung_Fu_Panda.png" },
-            { n: "Phineas Flynn", img: "https://upload.wikimedia.org/wikipedia/en/e/e0/Phineas_Flynn.png" },
-            { n: "Baymax", img: "https://upload.wikimedia.org/wikipedia/en/0/05/Baymax.png" },
-            { n: "Ben 10", img: "https://upload.wikimedia.org/wikipedia/en/7/7b/Ben_10_Omniverse_character_design.png" },
-            { n: "Bill Cipher", img: "https://upload.wikimedia.org/wikipedia/en/e/e5/Bill_Cipher.png" },
-            { n: "Wall-E", img: "https://upload.wikimedia.org/wikipedia/en/b/b3/WALL-E_character.png" },
-            { n: "Minion (Bob)", img: "https://upload.wikimedia.org/wikipedia/en/3/3e/Minion_Bob.png" },
-            { n: "Gumball Watterson", img: "https://upload.wikimedia.org/wikipedia/en/e/e3/Gumball_Watterson.png" },
-            { n: "Mordecai", img: "https://upload.wikimedia.org/wikipedia/en/e/ee/Mordecai_Regular_Show.png" },
-            { n: "Elsa (Frozen)", img: "https://upload.wikimedia.org/wikipedia/en/5/5e/Elsa_from_Disney%27s_Frozen.png" },
-            { n: "Desdentao", img: "https://upload.wikimedia.org/wikipedia/en/c/ca/Toothless_Dreamworks.png" }
+        // ==========================================
+        //  JUEGO 1: A DIBUJAR (NUEVO)
+        // ==========================================
+        const personajesDibujo = [
+            { nombre: "MICKEY MOUSE", img: "https://upload.wikimedia.org/wikipedia/en/d/d4/Mickey_Mouse.png" },
+            { nombre: "BOB ESPONJA", img: "https://upload.wikimedia.org/wikipedia/en/3/3b/SpongeBob_SquarePants_character.svg" },
+            { nombre: "PIKACHU", img: "https://upload.wikimedia.org/wikipedia/en/a/a6/Pokémon_Pikachu_art.png" },
+            { nombre: "HOMER SIMPSON", img: "https://upload.wikimedia.org/wikipedia/en/0/02/Homer_Simpson_2006.png" },
+            { nombre: "GOKU", img: "https://upload.wikimedia.org/wikipedia/en/3/33/Son_Goku_Dragon_Ball_Super.png" },
+            { nombre: "SHREK", img: "https://upload.wikimedia.org/wikipedia/en/4/4d/Shrek_%28character%29.png" },
+            { nombre: "SUPER MARIO", img: "https://upload.wikimedia.org/wikipedia/en/a/a9/MarioNSMBUDeluxe.png" },
+            { nombre: "ELSA (FROZEN)", img: "https://upload.wikimedia.org/wikipedia/en/5/5e/Elsa_from_Disney%27s_Frozen.png" },
+            { nombre: "BATMAN", img: "https://upload.wikimedia.org/wikipedia/en/c/c7/Batman_Infobox.jpg" },
+            { nombre: "SPIDER-MAN", img: "https://upload.wikimedia.org/wikipedia/en/2/21/Web_of_Spider-Man_Vol_1_129-1.png" },
+            { nombre: "DORAEMON", img: "https://upload.wikimedia.org/wikipedia/en/c/c8/Doraemon_character.png" },
+            { nombre: "MINION", img: "https://upload.wikimedia.org/wikipedia/en/7/7d/Minions_characters.png" },
+            { nombre: "PEPPA PIG", img: "https://upload.wikimedia.org/wikipedia/en/0/03/Peppa_Pig_Title.png" }, // Logo genérico si no carga char
+            { nombre: "SCOOBY DOO", img: "https://upload.wikimedia.org/wikipedia/en/5/53/Scooby-Doo.png" },
+            { nombre: "BUGS BUNNY", img: "https://upload.wikimedia.org/wikipedia/en/1/17/Bugs_Bunny.svg" }
         ];
 
-        let paintInterval;
-        function iniciarPintar() {
-            showScreen('paint-play');
-            const randomChar = personajesData[Math.floor(Math.random() * personajesData.length)];
-            document.getElementById('char-name').innerText = randomChar.n.toUpperCase();
-            document.getElementById('char-photo').src = randomChar.img;
+        function iniciarJuegoDibujo() {
+            showScreen('dibujar-play');
+            siguientePersonajeDibujo();
+        }
 
-            let tiempo = 60;
-            const timerEl = document.getElementById('paint-timer');
-            timerEl.innerText = "01:00";
-            
-            clearInterval(paintInterval);
-            paintInterval = setInterval(() => {
-                tiempo--;
-                let s = tiempo % 60;
-                timerEl.innerText = `00:${s.toString().padStart(2, '0')}`;
-                if (tiempo <= 0) {
-                    clearInterval(paintInterval);
-                    showScreen('paint-finish');
+        function siguientePersonajeDibujo() {
+            // Reiniciar timer
+            clearInterval(timerDibujoInterval);
+            let tiempoRestante = 60;
+            const timerDisplay = document.getElementById('timer-dibujo');
+            timerDisplay.innerText = "01:00";
+            timerDisplay.style.color = "var(--danger)";
+
+            // Selección Aleatoria
+            const randomChar = personajesDibujo[Math.floor(Math.random() * personajesDibujo.length)];
+            document.getElementById('nombre-personaje').innerText = randomChar.nombre;
+            document.getElementById('img-personaje').src = randomChar.img;
+
+            // Iniciar cuenta atrás
+            timerDibujoInterval = setInterval(() => {
+                tiempoRestante--;
+                let m = Math.floor(tiempoRestante / 60);
+                let s = tiempoRestante % 60;
+                timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+                if(tiempoRestante <= 10) {
+                     timerDisplay.style.color = "#ff0000"; // Rojo intenso al final
+                }
+
+                if (tiempoRestante <= 0) {
+                    clearInterval(timerDibujoInterval);
+                    timerDisplay.innerText = "¡TIEMPO!";
                 }
             }, 1000);
         }
 
-        function detenerPintar() {
-            clearInterval(paintInterval);
+        function detenerDibujo() {
+            clearInterval(timerDibujoInterval);
             showScreen('menu');
         }
 
-        // --- RESTO DE LÓGICAS (HEDBANZ, IMPOSTOR, ETC) ---
-        // (Mantengo las funciones originales para que no se pierda nada)
-        let timerInterval;
+
+        // ==========================================
+        //  JUEGO 2: HEDBANZ (DATOS RESTAURADOS)
+        // ==========================================
         const categoriasData = {
-            "Comida": ["Pizza", "Sushi", "Hamburguesa", "Paella", "Ramen", "Croqueta", "Donut"],
-            "Cine": ["Star Wars", "Titanic", "Avatar", "Shrek", "Joker", "Harry Potter", "Toy Story"],
-            "Animales": ["Elefante", "Jirafa", "Pingüino", "Pulpo", "León", "Tiburón"],
-            "Objetos": ["Paraguas", "Telescopio", "Guitarra", "Espejo", "Reloj", "Móvil"]
+            "Comida": [
+                "Pizza", "Sushi", "Hamburguesa", "Paella", "Hamburguesa", "Pasta", "Lasaña", "Canelones", "Ramen", "Filete",
+                "Croqueta", "Tortilla", "Chuletón", "Salmorejo", "Guacamole", "Risotto", "Falafel", "Kebab", "Hummus", "Burrito",
+                "Poke", "Tiramisú", "Brownie", "Gazpacho", "Hot Dog", "Nuggets", "Donut", "Lechuga",
+                "Macarrones", "Ensaladilla", "Pancakes", "Mc Flurry", "Bacalao", "Sopa", "Tarta"
+            ],
+            "Cine": [
+                "Star Wars", "Titanic", "Avatar", "Shrek", "Joker", "Batman", "Inception", "Matrix", "Alien", "Jaws",
+                "Frozen", "Ratatouille", "Gladiator", "Coco", "Up", "Toy Story", "Casablanca", "Psicosis", "Godfather", "Pulp Fiction",
+                "Avengers", "Iron Man", "Harry Potter", "Spider-Man", "Jurassic Park", "Indiana Jones", "Rocky", "Rambo", "Terminator", "Grease",
+                "Dumbo", "Bambi", "Mulan", "Tarzán", "Cars", "Soul", "Saw", "It", "Scream", "Barbie"
+            ],
+            "Deportes": [
+                "Tenis", "Golf", "Boxeo", "Rugby", "Natación", "Esquí", "Fútbol", "Baloncesto", "Voleibol", "Balonmano",
+                "Atletismo", "Ciclismo", "Surf", "Skate", "Pádel", "Béisbol", "Hockey", "Esgrima", "Judo", "Karate",
+                "Yoga", "Pilates", "Crossfit", "Ajedrez", "Dardos", "Billar", "Ping Pong", "Waterpolo", "Remo", "Vela",
+                "Escalada", "Senderismo", "Triatlón", "Maratón", "Fórmula 1", "Motociclismo", "Bádminton", "Gimnasia"
+            ],
+            "Animales": [
+                "Elefante", "Jirafa", "Pingüino", "Canguro", "Pulpo", "Lobo", "León", "Tigre", "Oso", "Cebra",
+                "Delfín", "Ballena", "Tiburón", "Águila", "Loro", "Búho", "Serpiente", "Cocodrilo", "Tortuga", "Rana",
+                "Caballo", "Vaca", "Cerdo", "Oveja", "Gallina", "Conejo", "Ardilla", "Zorro", "Mono", "Gorila",
+                "Panda", "Koala", "Camello", "Hipopótamo", "Rinoceronte", "Guepardo", "Hiena", "Mapache", "Murciélago", "Medusa"
+            ],
+            "Lugares": [
+                "Playa", "Montaña", "Desierto", "Selva", "Aeropuerto", "Cárcel", "Hospital", "Escuela", "Iglesia", "Museo",
+                "Cine", "Teatro", "Estadio", "Gimnasio", "Biblioteca", "Zoo", "Parque", "Plaza", "Castillo", "Faro",
+                "Puerto", "Estación", "Metro", "Banco", "Supermercado", "Farmacia", "Hotel", "Restaurante", "Discoteca", "Casino",
+                "Pueblo", "Ciudad", "Isla", "Volcán", "Cueva", "Pantano", "Rascacielos", "Puente", "Cementerio", "Circo"
+            ],
+            "Objetos": [
+                "Paraguas", "Telescopio", "Guitarra", "Espejo", "Taladro", "Reloj", "Llave", "Martillo", "Cuchara", "Tenedor",
+                "Cuchillo", "Plato", "Vaso", "Sartén", "Nevera", "Horno", "Escoba", "Cubo", "Fregona", "Móvil",
+                "Ordenador", "Ratón", "Teclado", "Pantalla", "Altavoz", "Cámara", "Libro", "Bolígrafo", "Lápiz", "Goma",
+                "Tijeras", "Pegamento", "Maleta", "Mochila", "Cartera", "Moneda", "Billete", "Gafas", "Casco", "Linterna"
+            ],
+            "Marcas": [
+                "Nike", "Apple", "Coca-Cola", "Disney", "Tesla", "Google", "Adidas", "Puma", "Reebok", "Zara",
+                "Amazon", "Facebook", "Instagram", "Netflix", "Spotify", "Microsoft", "Samsung", "Sony", "Nintendo", "Toyota",
+                "Mercedes", "Ferrari", "BMW", "Audi", "IKEA", "McDonalds", "Burger King", "Starbucks", "Pepsi", "Red Bull",
+                "Lego", "Mattel", "Hasbro", "Gucci", "Prada", "Chanel", "Rolex", "Visa", "Paypal", "Uber"
+            ],
+            "Personajes": [
+                "Spider-Man", "Messi", "Mickey Mouse", "Doraemon", "Pikachu", "Hulk", "Batman", "Superman", "Wonder Woman", "Thor",
+                "Iron Man", "Capitán América", "Black Widow", "Loki", "Yoda", "Darth Vader", "Harry Potter", "Hermione", "Voldemort", "Gandalf",
+                "Frodo", "Sherlock Holmes", "Jack Sparrow", "James Bond", "Indiana Jones", "Lara Croft", "Mario", "Luigi", "Donkey Kong", "Sonic",
+                "Cristiano Ronaldo", "Rafa Nadal", "Pau Gasol", "Michael Jordan", "LeBron James", "Elon Musk", "Bill Gates", "Steve Jobs", "Zuckerberg", "Beyoncé"
+            ],
+            "Acciones": [
+                "Bailar", "Cocinando", "Escalando", "Durmiendo", "Llorando", "Correr", "Saltar", "Cantar", "Reír", "Gritar",
+                "Nadar", "Volar", "Conducir", "Dibujar", "Escribir", "Leer", "Comer", "Beber", "Estudiar", "Trabajar",
+                "Pelear", "Besar", "Abrazar", "Pasear", "Viajar", "Comprar", "Vender", "Limpiar", "Pintar", "Construir",
+                "Destruir", "Cazar", "Pescar", "Sembrar", "Regar", "Afeitar", "Peinar", "Vestir", "Mirar", "Escuchar"
+            ],
+            "Gimnasio": [
+                "Mancuerna", "Press de Banca", "Sentadilla", "Proteína", "Creatina", "Cinta de Correr", "Monitor", "Abdominales", "Bíceps", "Tríceps",
+                "Dominadas", "Peso Muerto", "Zancadas", "Burpees", "Spinning", "Cinturón", "Polea", "Elíptica",
+                "Remo", "Plancha", "Crossfit", "Entrenador", "Toalla", "Series", "Repeticiones",
+                "Cardio", "Estiramientos", "Glúteo", "Cuádriceps", "Hombros", "Prensa", "Barra Olímpica", "Discos"
+            ],
+            "Música": [
+                "Rock", "Reggaeton", "Piano", "Concierto", "Rap", "Batería", "Público", "Guitarra", "Violín", "Flauta",
+                "Trompeta", "Saxofón", "Canto", "Coro", "Ópera", "Jazz", "Pop", "Heavy Metal", "Trap", "Flamenco",
+                "Salsa", "Bachata", "Merengue", "Tango", "Blues", "Soul", "Funk", "Techno", "House",
+                "Festival", "Escenario", "Micrófono", "Auriculares", "Vinilo", "Casete", "CD", "Radio", "Partitura", "Ritmo"
+            ]
         };
+
         let poolPalabrasRuleta = [];
         let ruletaScore = 0;
 
         function prepararHedbanz() {
             const llaves = Object.keys(categoriasData);
-            const elegidas = llaves.slice(0, 3);
-            document.getElementById('cats-display').innerHTML = elegidas.map(c => `<span class="cat-tag">${c}</span>`).join("");
+            const elegidas = [];
+            while(elegidas.length < 3) {
+                let cat = llaves[Math.floor(Math.random() * llaves.length)];
+                if(!elegidas.includes(cat)) elegidas.push(cat);
+            }
+
+            const catsDisplay = document.getElementById('cats-display');
+            catsDisplay.innerHTML = elegidas.map(c => `<span class="cat-tag">${c}</span>`).join("");
+
             poolPalabrasRuleta = [];
-            elegidas.forEach(c => poolPalabrasRuleta = poolPalabrasRuleta.concat(categoriasData[c]));
+            elegidas.forEach(c => {
+                poolPalabrasRuleta = poolPalabrasRuleta.concat(categoriasData[c]);
+            });
             poolPalabrasRuleta.sort(() => Math.random() - 0.5);
+
             ruletaScore = 0;
             document.getElementById('score-val').innerText = "0";
+            
             showScreen('ruleta-active');
             siguientePalabraRuleta();
             iniciarContador(120);
         }
 
         function iniciarContador(segundos) {
+            const timerEl = document.getElementById('timer');
             let restante = segundos;
+
+            clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 let m = Math.floor(restante / 60);
                 let s = restante % 60;
-                document.getElementById('timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                if (restante-- <= 0) { clearInterval(timerInterval); showScreen('ruleta-results'); }
+                timerEl.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+                if (restante <= 0) {
+                    finalizarHedbanz();
+                }
+                restante--;
             }, 1000);
         }
 
         function siguientePalabraRuleta() {
             if (poolPalabrasRuleta.length > 0) {
-                document.getElementById('current-word-display').innerText = poolPalabrasRuleta.pop();
-            } else { showScreen('ruleta-results'); }
+                const p = poolPalabrasRuleta.pop();
+                document.getElementById('current-word-display').innerText = p;
+            } else {
+                finalizarHedbanz();
+            }
         }
 
-        function palabraAcertada() { ruletaScore++; document.getElementById('score-val').innerText = ruletaScore; siguientePalabraRuleta(); }
+        function palabraAcertada() {
+            ruletaScore++;
+            document.getElementById('score-val').innerText = ruletaScore;
+            siguientePalabraRuleta();
+        }
 
-        const mazoPalabras = [{ tripulante: "iPhone", impostor: "Tecnología" }, { tripulante: "Cama", impostor: "Noche" }];
-        let jugadores = []; let indiceActual = 0;
+        function finalizarHedbanz() {
+            clearInterval(timerInterval);
+            document.getElementById('final-score').innerText = ruletaScore;
+            showScreen('ruleta-results');
+        }
+
+        // ==========================================
+        //  JUEGO 3: IMPOSTOR (DATOS RESTAURADOS)
+        // ==========================================
+        const mazoPalabras = [
+            { tripulante: "iPhone", impostor: "Tecnología" }, { tripulante: "Microondas", impostor: "Electrodoméstico" },
+            { tripulante: "Taller", impostor: "Tere" },{ tripulante: "Esponjita", impostor: "Bolea" },
+            { tripulante: "Lavadora", impostor: "Lucía" },{ tripulante: "Café", impostor: "Bala" },
+            { tripulante: "Domingo", impostor: "Mc Flurry" },{ tripulante: "Elfo", impostor: "Navidad" },
+            { tripulante: "Mary Shelley", impostor: "Terror" },
+            { tripulante: "Taladro", impostor: "Herramienta" }, { tripulante: "Calculadora", impostor: "Matemáticas" },
+            { tripulante: "Satélite", impostor: "Espacio" }, { tripulante: "Dron", impostor: "Vuelo" },
+            { tripulante: "Cámara", impostor: "Imagen" }, { tripulante: "Impresora", impostor: "Oficina" },
+            { tripulante: "Auriculares", impostor: "Sonido" }, { tripulante: "Batería", impostor: "Energía" },
+            { tripulante: "Reloj", impostor: "Tiempo" }, { tripulante: "Gafas", impostor: "Lente" },
+            { tripulante: "Brújula", impostor: "Orientación" }, { tripulante: "Bombilla", impostor: "Electricidad" },
+            { tripulante: "Cama", impostor: "Noche" }, { tripulante: "Sofá", impostor: "Casa" },
+            { tripulante: "Espejo", impostor: "Baño" }, { tripulante: "Sartén", impostor: "Comida" },
+            { tripulante: "Nevera", impostor: "Frío" }, { tripulante: "Delfín", impostor: "Naturaleza" },
+            { tripulante: "Tigre", impostor: "Mamífero" }, { tripulante: "Águila", impostor: "Aire" },
+            { tripulante: "Tiburón", impostor: "Mar" }, { tripulante: "Pizza", impostor: "Italia" },
+            { tripulante: "Hamburguesa", impostor: "Comida" }, { tripulante: "Sushi", impostor: "Restaurante" },
+            { tripulante: "Fútbol", impostor: "Deporte" }, { tripulante: "Ajedrez", impostor: "Juego" },
+            { tripulante: "Madrid", impostor: "Lugar" }, { tripulante: "España", impostor: "País" },
+            { tripulante: "Médico", impostor: "Persona" }, { tripulante: "Bombero", impostor: "Emergencia" },
+            { tripulante: "Lunes", impostor: "Tiempo" }, { tripulante: "Enero", impostor: "Mes" },
+            { tripulante: "Navidad", impostor: "Invierno" }, { tripulante: "Verano", impostor: "Estación" },
+            { tripulante: "Corazón", impostor: "Persona" }, { tripulante: "Mano", impostor: "Guante" },
+            { tripulante: "Zapatos", impostor: "Ropa" }, { tripulante: "Oro", impostor: "Rico" },
+            { tripulante: "Amor", impostor: "Sentimiento" }, { tripulante: "Miedo", impostor: "Emoción" },
+            { tripulante: "Dólar", impostor: "Moneda" }, { tripulante: "Cero", impostor: "Número" },
+            { tripulante: "Triángulo", impostor: "Forma" }, { tripulante: "Rojo", impostor: "Color" },
+            { tripulante: "Kilómetro", impostor: "Medida" }, { tripulante: "Internet", impostor: "Red" },
+            { tripulante: "Gripe", impostor: "Enfermedad" }, { tripulante: "Sueño", impostor: "Noche" },
+            { tripulante: "Boda", impostor: "Celebración" }, { tripulante: "Guerra", impostor: "Conflicto" },
+            { tripulante: "Paz", impostor: "Símbolo" }, { tripulante: "Música", impostor: "Sonido" },
+            { tripulante: "Poesía", impostor: "Literatura" }, { tripulante: "Hambre", impostor: "Sensación" }
+        ];
+
+        let jugadores = [];
+        let indiceActual = 0;
 
         function iniciarImpostor() {
             const n = document.getElementById('num-jugadores').value;
-            const impIdx = Math.floor(Math.random() * n);
+            const impostorIdx = Math.floor(Math.random() * n);
             const pareja = mazoPalabras[Math.floor(Math.random() * mazoPalabras.length)];
+            
             jugadores = [];
-            for (let i = 0; i < n; i++) jugadores.push(i == impIdx ? "🕵️ Tu pista es:\n" + pareja.impostor.toUpperCase() : "✅ La palabra es:\n" + pareja.tripulante.toUpperCase());
+            for (let i = 0; i < n; i++) {
+                if (i === parseInt(impostorIdx)) {
+                    jugadores.push("🕵️ Tu pista es:\n" + pareja.impostor.toUpperCase());
+                } else {
+                    jugadores.push("✅ La palabra es:\n" + pareja.tripulante.toUpperCase());
+                }
+            }
             indiceActual = 0;
+            document.getElementById('btn-finalizar').style.display = "none";
+            document.getElementById('instruccion').style.display = "block";
             prepararTurno();
             showScreen('impostor-play');
         }
 
         function prepararTurno() {
             document.getElementById('turno-de').innerText = "JUGADOR " + (indiceActual + 1);
-            document.getElementById('role-display').style.display = "none";
+            const display = document.getElementById('role-display');
+            display.style.display = "none";
+            display.style.borderColor = "#efe1a7"; 
+            display.style.color = "var(--text)";
             document.getElementById('btn-revelar').style.display = "block";
             document.getElementById('btn-siguiente').style.display = "none";
         }
 
         function revelarRol() {
-            const d = document.getElementById('role-display');
-            d.innerText = jugadores[indiceActual];
-            d.style.display = "flex";
-            d.style.color = d.innerText.includes("🕵️") ? "var(--danger)" : "var(--success)";
+            const display = document.getElementById('role-display');
+            const contenido = jugadores[indiceActual];
+            display.innerText = contenido;
+            display.style.display = "flex";
+            
+            if (contenido.includes("🕵️")) {
+                display.style.borderColor = "var(--danger)";
+                display.style.color = "var(--danger)";
+            } else {
+                display.style.borderColor = "var(--success)";
+                display.style.color = "var(--success)";
+            }
+
             document.getElementById('btn-revelar').style.display = "none";
             document.getElementById('btn-siguiente').style.display = "block";
         }
 
         function siguienteJugador() {
             indiceActual++;
-            if (indiceActual < jugadores.length) prepararTurno();
-            else {
+            if (indiceActual < jugadores.length) {
+                prepararTurno();
+            } else {
                 document.getElementById('turno-de').innerText = "¡A JUGAR!";
+                document.getElementById('instruccion').style.display = "none";
                 document.getElementById('role-display').innerText = "Debatid y encontrad al impostor.";
+                document.getElementById('role-display').style.color = "var(--accent)";
+                document.getElementById('role-display').style.borderColor = "var(--accent)";
                 document.getElementById('btn-siguiente').style.display = "none";
                 document.getElementById('btn-finalizar').style.display = "block";
             }
         }
 
+        // ==========================================
+        //  JUEGO 4: PAÍS (DATOS RESTAURADOS)
+        // ==========================================
         function generarPais() {
-            const p = ["España", "Francia", "Japón", "México", "Argentina", "Italia"];
-            document.getElementById('nombre-pais').innerText = p[Math.floor(Math.random() * p.length)].toUpperCase();
+            const paises = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Argelia", "Argentina", "Australia", "Austria", "Bélgica", "Bolivia", "Brasil", "Canadá", "Chile", "China", "Colombia", "Corea del Sur", "Costa de Marfil", "Costa Rica", "Croacia", "Cuba", "Dinamarca", "Ecuador", "Egipto", "El Salvador", "España", "Estados Unidos", "Filipinas", "Finlandia", "Francia", "Grecia", "Guatemala", "Haití", "Honduras", "Hungría", "India", "Indonesia", "Irak", "Irán", "Irlanda", "Islandia", "Israel", "Italia", "Jamaica", "Japón", "Jordania", "Marruecos", "México", "Noruega", "Nueva Zelanda", "Países Bajos", "Panamá", "Paraguay", "Perú", "Polonia", "Portugal", "Reino Unido", "Rusia", "Senegal", "Serbia", "Singapur", "Siria", "Sudáfrica", "Suecia", "Suiza", "Tailandia", "Turquía", "Ucrania", "Uruguay", "Venezuela", "Vietnam"];
+            const p = paises[Math.floor(Math.random() * paises.length)];
+            document.getElementById('nombre-pais').innerText = p.toUpperCase();
         }
 
+        // ==========================================
+        //  JUEGO 5: CAFÉ O TÉ (DATOS RESTAURADOS)
+        // ==========================================
+        const palabrasCafeTe = [
+            "Cepillo de dientes", "Ventilador", "Calcetín", "Mando a distancia", 
+            "Gorra", "Botella", "Cojín", "Toalla", "Llaves", "Cuaderno",
+            "Mochila", "Cargador", "Microondas", "Maceta", "Silla", "Mesa",
+            "Lámpara", "Alfombra", "Espejo", "Perfume", "Cinturón",
+            "Servilleta", "Bicicleta", "Monedero", "Anillo", "Collar",
+            "Pendientes", "Zapatilla", "Bolsa", "Papelera"
+        ];
+        
         let contadorCafe = 20;
+
         function iniciarCafe() {
-            contadorCafe = 20; document.getElementById('cafe-counter').innerText = 20;
-            document.getElementById('cafe-word').innerText = "ESPEJO";
+            contadorCafe = 20;
+            actualizarContadorUI();
+            
+            document.getElementById('btn-restar-cafe').disabled = false;
+            document.getElementById('btn-restar-cafe').style.opacity = "1";
+
+            const palabra = palabrasCafeTe[Math.floor(Math.random() * palabrasCafeTe.length)];
+            document.getElementById('cafe-word').innerText = palabra.toUpperCase();
+            
             showScreen('cafe-play');
         }
-        function restarPalabraCafe() { if(contadorCafe > 0) { contadorCafe--; document.getElementById('cafe-counter').innerText = contadorCafe; } }
+
+        function restarPalabraCafe() {
+            if(contadorCafe > 0) {
+                contadorCafe--;
+                actualizarContadorUI();
+            }
+            
+            if(contadorCafe === 0) {
+                document.getElementById('btn-restar-cafe').disabled = true;
+                document.getElementById('btn-restar-cafe').style.opacity = "0.5";
+                alert("¡Se acabaron las palabras!");
+            }
+        }
+
+        function actualizarContadorUI() {
+            const el = document.getElementById('cafe-counter');
+            el.innerText = contadorCafe;
+            if(contadorCafe <= 5) {
+                el.style.color = "var(--danger)";
+            } else {
+                el.style.color = "var(--accent)";
+            }
+        }
     </script>
 </body>
 </html>
-
