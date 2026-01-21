@@ -182,25 +182,36 @@
             <button onclick="showScreen('dibujar-setup')">🎨 A Dibujar</button>
         </div>
 
-        <div id="dibujar-setup" class="screen">
+<div id="dibujar-setup" class="screen">
             <h2>🎨 A DIBUJAR</h2>
-            <p>Aparecerá un personaje y su foto.</p>
-            <p>Tienes <strong>1 minuto</strong> para dibujarlo.</p>
-            <button onclick="iniciarJuegoDibujo()">¡EMPEZAR!</button>
+            <p>¿Cuántas personas van a adivinar?</p>
+            <input type="number" id="dibujo-num-jugadores" value="2" min="1" max="10">
+            <button onclick="configurarNombresDibujo()">SIGUIENTE</button>
             <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
+        <div id="dibujar-nombres" class="screen">
+            <h2>ESCRIBE LOS NOMBRES</h2>
+            <div id="contenedor-nombres-dibujo"></div>
+            <button onclick="empezarPartidaDibujo()">¡EMPEZAR JUEGO!</button>
+        </div>
+
         <div id="dibujar-play" class="screen">
-            <div class="timer" id="timer-dibujo">01:00</div>
-            
-            <div class="role-box" id="nombre-personaje" style="min-height: auto; padding: 15px; margin-top: 0; font-size: 1.8rem;">
+            <div class="timer" id="timer-dibujo">01:30</div>
+            <p>Personaje a dibujar:</p>
+            <div class="role-box" id="nombre-personaje" style="padding: 15px; margin-top: 0; font-size: 1.8rem;">
                 ---
             </div>
-
-            <button onclick="siguientePersonajeDibujo()">🔄 SIGUIENTE PERSONAJE</button>
+            <button class="btn-success" onclick="finalizarTiempoDibujo()">✅ HE TERMINADO</button>
             <button class="btn-secondary" onclick="detenerDibujo()">SALIR AL MENÚ</button>
         </div>
 
+        <div id="dibujar-guessing" class="screen">
+            <h2 id="titulo-adivinador">TURNO DE...</h2>
+            <p>¿Qué crees que ha dibujado?</p>
+            <input type="text" id="input-idea-dibujo" placeholder="Tu respuesta...">
+            <button onclick="guardarIdeaJugador()">GUARDAR IDEA</button>
+        </div>
         <div id="impostor-config" class="screen">
             <h2>🕵️ CONFIGURACIÓN</h2>
             <p>¿Cuántos jugadores sois?</p>
@@ -291,64 +302,97 @@
         //  JUEGO 1: A DIBUJAR (NUEVO)
         // ==========================================
         const personajesDibujo = [
-            { nombre: "MICKEY MOUSE", img: "https://upload.wikimedia.org/wikipedia/en/d/d4/Mickey_Mouse.png" },
-            { nombre: "BOB ESPONJA", img: "https://upload.wikimedia.org/wikipedia/en/3/3b/SpongeBob_SquarePants_character.svg" },
-            { nombre: "PIKACHU", img: "https://upload.wikimedia.org/wikipedia/en/a/a6/Pokémon_Pikachu_art.png" },
-            { nombre: "HOMER SIMPSON", img: "https://upload.wikimedia.org/wikipedia/en/0/02/Homer_Simpson_2006.png" },
-            { nombre: "GOKU", img: "https://upload.wikimedia.org/wikipedia/en/3/33/Son_Goku_Dragon_Ball_Super.png" },
-            { nombre: "SHREK", img: "https://upload.wikimedia.org/wikipedia/en/4/4d/Shrek_%28character%29.png" },
-            { nombre: "SUPER MARIO", img: "https://upload.wikimedia.org/wikipedia/en/a/a9/MarioNSMBUDeluxe.png" },
-            { nombre: "ELSA (FROZEN)", img: "https://upload.wikimedia.org/wikipedia/en/5/5e/Elsa_from_Disney%27s_Frozen.png" },
-            { nombre: "BATMAN", img: "https://upload.wikimedia.org/wikipedia/en/c/c7/Batman_Infobox.jpg" },
-            { nombre: "SPIDER-MAN", img: "https://upload.wikimedia.org/wikipedia/en/2/21/Web_of_Spider-Man_Vol_1_129-1.png" },
-            { nombre: "DORAEMON", img: "https://upload.wikimedia.org/wikipedia/en/c/c8/Doraemon_character.png" },
-            { nombre: "MINION", img: "https://upload.wikimedia.org/wikipedia/en/7/7d/Minions_characters.png" },
-            { nombre: "PEPPA PIG", img: "https://upload.wikimedia.org/wikipedia/en/0/03/Peppa_Pig_Title.png" }, // Logo genérico si no carga char
-            { nombre: "SCOOBY DOO", img: "https://upload.wikimedia.org/wikipedia/en/5/53/Scooby-Doo.png" },
-            { nombre: "BUGS BUNNY", img: "https://upload.wikimedia.org/wikipedia/en/1/17/Bugs_Bunny.svg" }
+            { nombre: "MICKEY MOUSE" }, { nombre: "PATO DONALD" }, { nombre: "BUGS BUNNY" }, 
+            { nombre: "SCOOBY DOO" }, { nombre: "TOM Y JERRY" }, { nombre: "PANTERA ROSA" },
+            { nombre: "BOB ESPONJA" }, { nombre: "SHREK" }, { nombre: "SPIDER-MAN" }, 
+            { nombre: "BATMAN" }, { nombre: "HULK" }, { nombre: "ELSA (FROZEN)" }, 
+            { nombre: "WOODY (TOY STORY)" }, { nombre: "RAYO MCQUEEN" }, { nombre: "HOMER SIMPSON" }, 
+            { nombre: "YODA" }, { nombre: "DARTH VADER" }, { nombre: "MINION" }
         ];
 
-        function iniciarJuegoDibujo() {
-            showScreen('dibujar-play');
-            siguientePersonajeDibujo();
+        let dibujoJugadores = []; 
+        let dibujoIndiceAdivinador = 0;
+        let personajeActual = "";
+
+        function configurarNombresDibujo() {
+            const num = document.getElementById('dibujo-num-jugadores').value;
+            const contenedor = document.getElementById('contenedor-nombres-dibujo');
+            contenedor.innerHTML = "";
+            for(let i=1; i<=num; i++) {
+                contenedor.innerHTML += `<input type="text" placeholder="Jugador ${i}" class="input-nombre-dibujo">`;
+            }
+            showScreen('dibujar-nombres');
         }
 
-        function siguientePersonajeDibujo() {
-            // Reiniciar timer
-            clearInterval(timerDibujoInterval);
-            let tiempoRestante = 60;
-            const timerDisplay = document.getElementById('timer-dibujo');
-            timerDisplay.innerText = "01:00";
-            timerDisplay.style.color = "var(--danger)";
+        function empezarPartidaDibujo() {
+            const inputs = document.querySelectorAll('.input-nombre-dibujo');
+            dibujoJugadores = [];
+            inputs.forEach(input => {
+                if(input.value.trim() !== "") dibujoJugadores.push({ nombre: input.value.trim(), idea: "" });
+            });
 
-            // Selección Aleatoria
+            if(dibujoJugadores.length === 0) {
+                alert("Introduce al menos un nombre");
+                return;
+            }
+
             const randomChar = personajesDibujo[Math.floor(Math.random() * personajesDibujo.length)];
-            document.getElementById('nombre-personaje').innerText = randomChar.nombre;
+            personajeActual = randomChar.nombre;
+            document.getElementById('nombre-personaje').innerText = personajeActual;
+            
+            showScreen('dibujar-play');
+            iniciarTimerDibujo(90); 
+        }
 
-            // Iniciar cuenta atrás
+        function iniciarTimerDibujo(segundos) {
+            let tiempoRestante = segundos;
+            const timerDisplay = document.getElementById('timer-dibujo');
             timerDibujoInterval = setInterval(() => {
                 tiempoRestante--;
                 let m = Math.floor(tiempoRestante / 60);
                 let s = tiempoRestante % 60;
                 timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                
-                if(tiempoRestante <= 10) {
-                     timerDisplay.style.color = "#ff0000"; // Rojo intenso al final
-                }
-
-                if (tiempoRestante <= 0) {
-                    clearInterval(timerDibujoInterval);
-                    timerDisplay.innerText = "¡TIEMPO!";
-                }
+                if (tiempoRestante <= 0) finalizarTiempoDibujo();
             }, 1000);
+        }
+
+        function finalizarTiempoDibujo() {
+            clearInterval(timerDibujoInterval);
+            dibujoIndiceAdivinador = 0;
+            irAFaseIdeas();
+        }
+
+        function irAFaseIdeas() {
+            if(dibujoIndiceAdivinador < dibujoJugadores.length) {
+                document.getElementById('titulo-adivinador').innerText = "TURNO DE: " + dibujoJugadores[dibujoIndiceAdivinador].nombre;
+                document.getElementById('input-idea-dibujo').value = "";
+                showScreen('dibujar-guessing');
+            } else {
+                mostrarResultadosDibujo();
+            }
+        }
+
+        function guardarIdeaJugador() {
+            const idea = document.getElementById('input-idea-dibujo').value;
+            dibujoJugadores[dibujoIndiceAdivinador].idea = idea || "No respondió";
+            dibujoIndiceAdivinador++;
+            irAFaseIdeas();
+        }
+
+        function mostrarResultadosDibujo() {
+            document.getElementById('solucion-dibujo').innerText = personajeActual;
+            const lista = document.getElementById('lista-ideas-dibujo');
+            lista.innerHTML = "";
+            dibujoJugadores.forEach(j => {
+                lista.innerHTML += `<div class="result-item"><span class="result-name">${j.nombre}:</span> ${j.idea}</div>`;
+            });
+            showScreen('dibujar-results');
         }
 
         function detenerDibujo() {
             clearInterval(timerDibujoInterval);
             showScreen('menu');
         }
-
-
         // ==========================================
         //  JUEGO 2: HEDBANZ (DATOS RESTAURADOS)
         // ==========================================
@@ -652,4 +696,5 @@
     </script>
 </body>
 </html>
+
 
