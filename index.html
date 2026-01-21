@@ -193,10 +193,6 @@
         <div id="dibujar-play" class="screen">
             <div class="timer" id="timer-dibujo">01:00</div>
             
-            <div class="char-image-container">
-                <img id="img-personaje" src="" alt="Personaje a dibujar">
-            </div>
-
             <div class="role-box" id="nombre-personaje" style="min-height: auto; padding: 15px; margin-top: 0; font-size: 1.8rem;">
                 ---
             </div>
@@ -328,7 +324,6 @@
             // Selección Aleatoria
             const randomChar = personajesDibujo[Math.floor(Math.random() * personajesDibujo.length)];
             document.getElementById('nombre-personaje').innerText = randomChar.nombre;
-            document.getElementById('img-personaje').src = randomChar.img;
 
             // Iniciar cuenta atrás
             timerDibujoInterval = setInterval(() => {
@@ -657,3 +652,4 @@
     </script>
 </body>
 </html>
+
