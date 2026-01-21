@@ -215,10 +215,10 @@
         <div id="dibujar-results" class="screen">
             <h2>RESULTADOS</h2>
             <p>La solución era:</p>
-            <div class="role-box" id="solucion-dibujo" style="font-size: 1.5rem; border-style: solid; border-color: var(--accent);">---</div>
-            <div class="results-list" id="lista-ideas-dibujo"></div>
+            <div class="role-box" id="solucion-dibujo" style="border-style: solid; font-size: 2rem;">---</div>
+            <div id="lista-ideas-dibujo"></div>
             <button onclick="showScreen('dibujar-setup')">JUGAR OTRA VEZ</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">MENU PRINCIPAL</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">MENÚ PRINCIPAL</button>
         </div>
         <div id="impostor-config" class="screen">
             <h2>🕵️ CONFIGURACIÓN</h2>
@@ -387,16 +387,19 @@
             irAFaseIdeas();
         }
 
-        function mostrarResultadosDibujo() {
+            function mostrarResultadosDibujo() {
             document.getElementById('solucion-dibujo').innerText = personajeActual;
             const lista = document.getElementById('lista-ideas-dibujo');
             lista.innerHTML = "";
             dibujoJugadores.forEach(j => {
-                lista.innerHTML += `<div class="result-item"><span class="result-name">${j.nombre}:</span> ${j.idea}</div>`;
+                lista.innerHTML += `
+                    <div class="result-item-box">
+                        <span class="result-player-name">${j.nombre} cree que es...</span>
+                        <span class="result-player-idea">${j.idea.toUpperCase()}</span>
+                    </div>`;
             });
             showScreen('dibujar-results');
         }
-
         function detenerDibujo() {
             clearInterval(timerDibujoInterval);
             showScreen('menu');
@@ -704,6 +707,7 @@
     </script>
 </body>
 </html>
+
 
 
 
