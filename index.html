@@ -212,6 +212,14 @@
             <input type="text" id="input-idea-dibujo" placeholder="Tu respuesta...">
             <button onclick="guardarIdeaJugador()">GUARDAR IDEA</button>
         </div>
+        <div id="dibujar-results" class="screen">
+            <h2>RESULTADOS</h2>
+            <p>La solución era:</p>
+            <div class="role-box" id="solucion-dibujo" style="font-size: 1.5rem; border-style: solid; border-color: var(--accent);">---</div>
+            <div class="results-list" id="lista-ideas-dibujo"></div>
+            <button onclick="showScreen('dibujar-setup')">JUGAR OTRA VEZ</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">MENU PRINCIPAL</button>
+        </div>
         <div id="impostor-config" class="screen">
             <h2>🕵️ CONFIGURACIÓN</h2>
             <p>¿Cuántos jugadores sois?</p>
@@ -696,5 +704,6 @@
     </script>
 </body>
 </html>
+
 
 
