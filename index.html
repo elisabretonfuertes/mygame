@@ -923,8 +923,8 @@
         let ultimaPantalla = 'menu';
 
 function showHelp(juego) {
-    const titulo = document.getElementById('ins-title');
-    const contenido = document.getElementById('ins-content');
+    const titulo = document.getElementById('help-title');
+    const contenido = document.getElementById('help-text');
     
     // Guardamos la pantalla actual para volver luego
     const pantallas = document.querySelectorAll('.screen');
@@ -943,16 +943,13 @@ function showHelp(juego) {
 
     titulo.innerText = "CÓMO JUGAR";
     contenido.innerHTML = manual[juego] || "Instrucciones no disponibles.";
-    
-    showScreen('instructions-screen');
-}
 
-function volverDelHelp() {
-    showScreen(ultimaPantalla);
+    showScreen('help-screen'); // ← corregido
 }
     </script>
 </body>
 </html>
+
 
 
 
