@@ -7,6 +7,7 @@
     <style>
         /* CSS: Estética Elegante (Dark Navy & Gold) */
         :root {
+            
             --bg: #000042;         /* Fondo Azul Marino Profundo */
             --card: #050552;       /* Un tono ligeramente más claro para la tarjeta */
             --accent: #efe1a7;     /* Dorado Pálido para textos y bordes */
@@ -19,7 +20,12 @@
             --success: #4ade80;    /* Verde neón suave */
             --secondary: #334155;  /* Gris azulado oscuro para botones secundarios */
         }
-
+        .btn-pastel-red { background:#ffadad; color:#5a0000; box-shadow:none; }
+        .btn-pastel-pink { background:#ffc6ff; color:#4a004a; box-shadow:none; }
+        .btn-pastel-orange { background:#ffd6a5; color:#5a2e00; box-shadow:none; }
+        .btn-pastel-yellow { background:#fdffb6; color:#5a5a00; box-shadow:none; }
+        .btn-pastel-green { background:#caffbf; color:#004d00; box-shadow:none; }
+        .btn-pastel-blue { background:#a0c4ff; color:#002a5a; box-shadow:none; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg);
@@ -201,15 +207,15 @@
             <button onclick="closeHelp()">ENTENDIDO</button>
         </div>
         
-        <div id="menu" class="screen active">
-            <h1>🎮 Reach the Stars</h1>
-            <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
-            <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
-            <button onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
-            <button onclick="showScreen('cafe-setup')">☕ Café o Té</button>
-            <button onclick="showScreen('dibujar-setup')">🎨 A Dibujar</button>
-            <button onclick="showScreen('stop-setup')">🛑 Rápido (STOP)</button>
-        </div>
+<div id="menu" class="screen active">
+    <h1>🎮 Reach the Stars</h1>
+    <button class="btn-pastel-red" onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
+    <button class="btn-pastel-pink" onclick="showScreen('pais-game')">🌍 Localiza el País</button>
+    <button class="btn-pastel-orange" onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
+    <button class="btn-pastel-yellow" onclick="showScreen('cafe-setup')">☕ Café o Té</button>
+    <button class="btn-pastel-green" onclick="showScreen('dibujar-setup')">🎨 A Dibujar</button>
+    <button class="btn-pastel-blue" onclick="showScreen('stop-setup')">🛑 Rápido (STOP)</button>
+</div>
 
         <div id="dibujar-setup" class="screen">
             <div class="help-icon" onclick="showHelp('dibujar')">?</div>
@@ -949,6 +955,7 @@ function showHelp(juego) {
     </script>
 </body>
 </html>
+
 
 
 
