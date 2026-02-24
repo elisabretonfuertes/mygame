@@ -881,19 +881,21 @@
             }, 1000);
         }
 
-        function prepararVotacionStop() {
-            const lista = document.getElementById('stop-voting-list');
-            lista.innerHTML = "";
+       function prepararVotacionStop() {
+    const lista = document.getElementById('stop-voting-list');
+    lista.innerHTML = "";
             
-        stopJugadores.forEach((jugador, index) => {
-            lista.innerHTML += `
-                <button class="btn-toggle" onclick="marcarCorrecto(this)">
-                    ${jugador.nombre}
-                </button>`;
-        });
+    stopJugadores.forEach((jugador, index) => {
+        lista.innerHTML += `
+            <button id="stop-vote-${index}" 
+                    class="btn-gold-dark" 
+                    onclick="marcarCorrecto(this)">
+                ${jugador.nombre}
+            </button>`;
+    });
                     
-            showScreen('stop-voting');
-        }
+    showScreen('stop-voting');
+}
 function marcarCorrecto(boton) {
     boton.classList.toggle("btn-correcto");
 }
@@ -903,16 +905,16 @@ function marcarCorrecto(boton) {
         }
 
         function guardarPuntosStop() {
-            stopJugadores.forEach((jugador, index) => {
-                const btn = document.getElementById(`stop-vote-${index}`);
-                if(btn.classList.contains('active-toggle')) {
-                    jugador.puntos += 1;
-                }
-            });
-            
-            categoriaActualIndice++;
-            mostrarSiguienteCategoriaStop();
+    stopJugadores.forEach((jugador, index) => {
+        const btn = document.getElementById(`stop-vote-${index}`);
+        if(btn.classList.contains('btn-correcto')) {
+            jugador.puntos += 1;
         }
+    });
+            
+    categoriaActualIndice++;
+    mostrarSiguienteCategoriaStop();
+}
 
         function mostrarResultadosStop() {
             // Ordenar por puntos (de mayor a menor)
@@ -961,6 +963,7 @@ function showHelp(juego) {
     </script>
 </body>
 </html>
+
 
 
 
