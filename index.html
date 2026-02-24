@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub</title>
     <style>
-        /* CSS: Estética elegante (Dark Navy & Gold) */
+        /* CSS: Estética Elegante (Dark Navy & Gold) */
         :root {
-            --bg: #000042;
-            --card: #050552;
-            --accent: #efe1a7;
-            --text: #efe1a7;
-            --button: #efe1a7;
-            --button-text: #000042;
-            --danger: #ff6b6b;
-            --success: #4ade80;
-            --secondary: #334155;
+            --bg: #000042;         /* Fondo Azul Marino Profundo */
+            --card: #050552;       /* Un tono ligeramente más claro para la tarjeta */
+            --accent: #efe1a7;     /* Dorado Pálido para textos y bordes */
+            --text: #efe1a7;       /* Texto Dorado */
+            --button: #efe1a7;     /* Botones Dorados */
+            --button-text: #000042;/* Texto dentro de los botones (oscuro para contraste) */
+            
+            /* Colores de estado ajustados para fondo oscuro */
+            --danger: #ff6b6b;     /* Rojo brillante */
+            --success: #4ade80;    /* Verde neón suave */
+            --secondary: #334155;  /* Gris azulado oscuro para botones secundarios */
         }
 
         body {
@@ -40,9 +42,10 @@
             border: 1px solid rgba(239, 225, 167, 0.3);
             max-height: 90vh;
             overflow-y: auto;
-            position: relative;
+            position: relative; /* Necesario para posicionar el icono de ayuda */
         }
 
+        /* --- ESTILOS DE AYUDA --- */
         .help-icon {
             position: absolute;
             top: 15px;
@@ -58,7 +61,13 @@
             justify-content: center;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s;
             z-index: 100;
+        }
+
+        .help-icon:hover {
+            background: var(--accent);
+            color: var(--bg);
         }
 
         .instructions-content {
@@ -70,12 +79,19 @@
             line-height: 1.5;
             color: #cbd5e1;
         }
+        /* ------------------------ */
+
+        .container::-webkit-scrollbar { width: 8px; }
+        .container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+        .container::-webkit-scrollbar-track { background: transparent; }
 
         h1, h2, h3 { 
             color: var(--accent); 
             margin-bottom: 1.5rem;
             font-weight: 800;
-            letter-spacing: 1px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .screen { display: none; animation: fadeIn 0.3s ease; }
@@ -97,17 +113,30 @@
             width: 100%;
             margin: 10px 0;
             cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(239, 225, 167, 0.2);
+            text-transform: uppercase;
         }
+
+        button:active { transform: scale(0.96); }
 
         .btn-secondary { 
             background: transparent; 
             border: 2px solid var(--secondary); 
             color: #94a3b8; 
+            box-shadow: none; 
         }
         
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-success { background: var(--success); color: #064e3b; }
+        .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3); }
+        .btn-success { background: var(--success); color: #064e3b; box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3); }
         
+        .btn-gold-dark { 
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            box-shadow: 0 4px 12px rgba(239, 225, 167, 0.1);
+        } 
+
         .role-box {
             white-space: pre-line;
             background: rgba(0, 0, 0, 0.2);
@@ -116,7 +145,12 @@
             border-radius: 20px;
             font-size: 1.5rem;
             font-weight: bold;
+            min-height: 60px;
             border: 2px dashed var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
             color: var(--text);
         }
 
@@ -129,12 +163,31 @@
             text-align: center;
             font-size: 1.3rem;
             color: var(--accent);
+            outline: none;
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .timer { font-size: 3rem; font-weight: 900; color: var(--danger); margin: 10px 0; }
-        .counter-big { font-size: 4rem; font-weight: 900; color: var(--accent); line-height: 1; }
-        .stop-letra-box { font-size: 5rem; color: var(--danger); line-height: 1; }
+        p { color: #cbd5e1; font-weight: 400; }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--danger);
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+        }
+
+        .cat-container { display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .big-word { font-size: 2.2rem; text-transform: uppercase; font-weight: 900; color: var(--accent); }
+
+        .counter-big { font-size: 4rem; font-weight: 900; color: var(--accent); margin: 0; line-height: 1; text-shadow: 0 0 20px rgba(239, 225, 167, 0.2); }
+
+        .stop-letra-box {
+            font-size: 5rem;
+            color: var(--danger);
+            line-height: 1;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -142,140 +195,174 @@
     <div class="container">
         
         <div id="help-screen" class="screen">
-            <h2 id="help-title">Instrucciones</h2>
-            <div id="help-text" class="instructions-content"></div>
-            <button onclick="closeHelp()">Entendido</button>
+            <h2 id="help-title">INSTRUCCIONES</h2>
+            <div id="help-text" class="instructions-content">
+                </div>
+            <button onclick="closeHelp()">ENTENDIDO</button>
         </div>
         
         <div id="menu" class="screen active">
-            <h1>Reach the stars</h1>
-            <button onclick="showScreen('impostor-config')">El impostor</button>
-            <button onclick="showScreen('pais-game')">Localiza el país</button>
-            <button onclick="showScreen('ruleta-setup')">Hedbanz</button>
-            <button onclick="showScreen('cafe-setup')">Café o té</button>
-            <button onclick="showScreen('dibujar-setup')">A dibujar</button>
-            <button onclick="showScreen('stop-setup')">Rápido (stop)</button>
+            <h1>🎮 Reach the Stars</h1>
+            <button onclick="showScreen('impostor-config')">🕵️ El Impostor</button>
+            <button onclick="showScreen('pais-game')">🌍 Localiza el País</button>
+            <button onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
+            <button onclick="showScreen('cafe-setup')">☕ Café o Té</button>
+            <button onclick="showScreen('dibujar-setup')">🎨 A Dibujar</button>
+            <button onclick="showScreen('stop-setup')">🛑 Rápido (STOP)</button>
         </div>
 
         <div id="dibujar-setup" class="screen">
             <div class="help-icon" onclick="showHelp('dibujar')">?</div>
-            <h2>A dibujar</h2>
+            <h2>🎨 A DIBUJAR</h2>
             <p>¿Cuántas personas van a adivinar?</p>
             <input type="number" id="dibujo-num-jugadores" value="2" min="1" max="10">
-            <button onclick="configurarNombresDibujo()">Siguiente</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <button onclick="configurarNombresDibujo()">SIGUIENTE</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
         <div id="dibujar-nombres" class="screen">
-            <h2>Escribe los nombres</h2>
+            <h2>ESCRIBE LOS NOMBRES</h2>
             <div id="contenedor-nombres-dibujo"></div>
-            <button onclick="empezarPartidaDibujo()">Empezar juego</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Cancelar</button>
+            <button onclick="empezarPartidaDibujo()">¡EMPEZAR JUEGO!</button>
         </div>
 
         <div id="dibujar-play" class="screen">
             <div class="timer" id="timer-dibujo">01:30</div>
             <p>Personaje a dibujar:</p>
-            <div class="role-box" id="nombre-personaje">---</div>
-            <button class="btn-success" onclick="finalizarTiempoDibujo()">He terminado</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Salir al menú</button>
+            <div class="role-box" id="nombre-personaje" style="padding: 15px; margin-top: 0; font-size: 1.8rem;">
+                ---
+            </div>
+            <button class="btn-success" onclick="finalizarTiempoDibujo()">✅ HE TERMINADO</button>
+            <button class="btn-secondary" onclick="detenerDibujo()">SALIR AL MENÚ</button>
         </div>
 
+        <div id="dibujar-guessing" class="screen">
+            <h2 id="titulo-adivinador">TURNO DE...</h2>
+            <p>¿Qué crees que ha dibujado?</p>
+            <input type="text" id="input-idea-dibujo" placeholder="Tu respuesta...">
+            <button onclick="guardarIdeaJugador()">GUARDAR IDEA</button>
+        </div>
+        
         <div id="dibujar-results" class="screen">
-            <h2>Resultados</h2>
-            <div class="role-box" id="solucion-dibujo">---</div>
+            <h2>RESULTADOS</h2>
+            <p>La solución era:</p>
+            <div class="role-box" id="solucion-dibujo" style="border-style: solid; font-size: 2rem;">---</div>
             <div id="lista-ideas-dibujo"></div>
-            <button onclick="showScreen('dibujar-setup')">Jugar otra vez</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <button onclick="showScreen('dibujar-setup')">JUGAR OTRA VEZ</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">MENÚ PRINCIPAL</button>
         </div>
-
+        
         <div id="impostor-config" class="screen">
             <div class="help-icon" onclick="showHelp('impostor')">?</div>
-            <h2>El impostor</h2>
+            <h2>🕵️ CONFIGURACIÓN</h2>
             <p>¿Cuántos jugadores sois?</p>
             <input type="number" id="num-jugadores" value="4" min="3">
-            <button onclick="iniciarImpostor()">Empezar partida</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <button onclick="iniciarImpostor()">EMPEZAR PARTIDA</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
         <div id="impostor-play" class="screen">
-            <h2 id="turno-de">Jugador 1</h2>
-            <p>Pasa el móvil a esta persona.</p>
+            <h2 id="turno-de">JUGADOR 1</h2>
+            <p id="instruccion">Pasa el móvil a esta persona.</p>
             <div id="role-display" class="role-box" style="display:none;">---</div>
-            <button id="btn-revelar" onclick="revelarRol()">Ver mi rol</button>
-            <button id="btn-siguiente" onclick="siguienteJugador()" style="display:none;">Siguiente</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Abandonar</button>
+            <button id="btn-revelar" onclick="revelarRol()">VER MI ROL</button>
+            <button id="btn-siguiente" onclick="siguienteJugador()" style="display:none;">SIGUIENTE</button>
+            <button id="btn-finalizar" onclick="showScreen('menu')" style="display:none;" class="btn-danger">TERMINAR PARTIDA</button>
         </div>
 
         <div id="pais-game" class="screen">
             <div class="help-icon" onclick="showHelp('pais')">?</div>
-            <h2>Localiza el país</h2>
-            <div class="role-box" id="nombre-pais">???</div>
-            <button onclick="generarPais()">Nuevo país</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <h2>🌍 EL PAÍS ES...</h2>
+            <div class="role-box" id="nombre-pais" style="color: var(--accent); border-style: solid; border-color: var(--accent);">???</div>
+            <button onclick="generarPais()">NUEVO PAÍS</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER AL MENÚ</button>
         </div>
 
         <div id="ruleta-setup" class="screen">
             <div class="help-icon" onclick="showHelp('hedbanz')">?</div>
-            <h2>Hedbanz</h2>
-            <p>Tenéis 2 minutos para adivinar palabras de categorías aleatorias.</p>
-            <button onclick="prepararHedbanz()">Empezar</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <h2>🎡 HEDBANZ</h2>
+            <p>Tendréis 2 minutos para adivinar palabras de 3 categorías aleatorias.</p>
+            <button onclick="prepararHedbanz()">¡GIRAR Y EMPEZAR!</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
         <div id="ruleta-active" class="screen">
             <div class="timer" id="timer">02:00</div>
-            <div class="role-box" id="current-word-display">---</div>
-            <button class="btn-success" onclick="palabraAcertada()">Adivinada</button>
-            <button class="btn-secondary" onclick="siguientePalabraRuleta()">Pasar</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Salir</button>
+            <div class="cat-container" id="cats-display"></div>
+            <p style="margin: 5px 0;">Adivinadas: <strong id="score-val" style="font-size:1.2rem; color:var(--accent)">0</strong></p>
+            <div class="role-box big-word" id="current-word-display" style="border-color: var(--accent); min-height: 120px;">
+                ---
+            </div>
+            <button class="btn-success" onclick="palabraAcertada()">✅ ¡ADIVINADA!</button>
+            <button class="btn-secondary" onclick="siguientePalabraRuleta()">⏭️ PASAR</button>
         </div>
 
         <div id="ruleta-results" class="screen">
-            <h2>Tiempo agotado</h2>
-            <div class="role-box" id="final-score">0</div>
-            <button onclick="showScreen('ruleta-setup')">Reintentar</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <h2>¡TIEMPO AGOTADO!</h2>
+            <p>Total de palabras adivinadas:</p>
+            <div class="role-box" id="final-score" style="border-color: var(--accent); color: var(--accent); font-size: 3rem;">0</div>
+            <button onclick="showScreen('menu')">VOLVER AL INICIO</button>
         </div>
 
         <div id="cafe-setup" class="screen">
             <div class="help-icon" onclick="showHelp('cafe')">?</div>
-            <h2>Café o té</h2>
-            <p>Tenéis 20 palabras para que adivinen el objeto.</p>
-            <button onclick="iniciarCafe()">Sacar palabra</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <h2>☕ CAFÉ O TÉ</h2>
+            <p>Tenéis <strong>20 palabras</strong> (en total) para que adivinen el objeto.</p>
+            <button onclick="iniciarCafe()">¡SACAR PALABRA!</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
         </div>
 
         <div id="cafe-play" class="screen">
             <p>Palabra secreta:</p>
-            <div class="role-box" id="cafe-word">---</div>
+            <div class="role-box" id="cafe-word" style="font-size: 2rem; color: var(--accent); border-color: var(--accent); margin: 10px 0;">---</div>
+            <p>Palabras restantes:</p>
             <div class="counter-big" id="cafe-counter">20</div>
-            <button onclick="restarPalabraCafe()">Gastar palabra</button>
-            <button class="btn-success" onclick="showScreen('menu')">Acertada</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Salir al menú</button>
+            <button onclick="restarPalabraCafe()" id="btn-restar-cafe" class="btn-gold-dark" style="margin-top: 20px;">➖ GASTAR PALABRA</button>
+            <button class="btn-success" onclick="showScreen('menu')">🎉 ¡ACERTADA!</button>
+            <button class="btn-secondary" onclick="iniciarCafe()">⏭️ SIGUIENTE PALABRA</button>
         </div>
 
         <div id="stop-setup" class="screen">
             <div class="help-icon" onclick="showHelp('stop')">?</div>
-            <h2>Rápido (stop)</h2>
+            <h2>🛑 RÁPIDO (STOP)</h2>
             <p>¿Cuántos vais a jugar?</p>
             <input type="number" id="stop-num-jugadores" value="3" min="2" max="10">
-            <button onclick="configurarNombresStop()">Siguiente</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <button onclick="configurarNombresStop()">SIGUIENTE</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
+        </div>
+
+        <div id="stop-nombres" class="screen">
+            <h2>NOMBRES</h2>
+            <div id="contenedor-nombres-stop"></div>
+            <button onclick="empezarPartidaStop()">¡EMPEZAR PARTIDA!</button>
         </div>
 
         <div id="stop-play" class="screen">
-            <div id="stop-letra" class="stop-letra-box">A</div>
-            <div class="role-box" id="stop-categoria">---</div>
-            <button id="btn-stop-game" class="btn-danger" onclick="pulsarStop()">Stop</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Cancelar partida</button>
+            <div class="role-box" style="margin-bottom: 10px; min-height: auto; padding: 10px;">
+                <span style="font-size: 1rem; color: #94a3b8;">LETRA DE LA RONDA</span>
+                <div id="stop-letra" class="stop-letra-box">A</div>
+            </div>
+            <p id="stop-cat-count" style="margin: 5px 0;">Categoría 1 de X</p>
+            <div class="role-box" id="stop-categoria" style="font-size: 2rem; min-height: 100px;">
+                ---
+            </div>
+            <div id="stop-countdown" class="counter-big" style="display:none;">3</div>
+            <button id="btn-stop-game" class="btn-danger" style="padding: 30px 20px; font-size: 2rem; border-radius: 20px;" onclick="pulsarStop()">
+                🛑 ¡STOP!
+            </button>
+        </div>
+
+        <div id="stop-voting" class="screen">
+            <h2>¿QUIÉN ACERTÓ?</h2>
+            <div id="stop-voting-list"></div>
+            <button onclick="guardarPuntosStop()" style="margin-top: 20px;">SIGUIENTE CATEGORÍA</button>
         </div>
 
         <div id="stop-results" class="screen">
-            <h2>Puntuaciones</h2>
-            <div id="stop-score-list"></div>
-            <button onclick="showScreen('stop-setup')">Nueva partida</button>
-            <button class="btn-secondary" onclick="showScreen('menu')">Volver al menú</button>
+            <h2>🏆 PUNTUACIONES</h2>
+            <div id="stop-score-list" style="margin-bottom: 20px;"></div>
+            <button onclick="showScreen('stop-setup')">JUGAR OTRA VEZ</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">MENÚ PRINCIPAL</button>
         </div>
 
     </div>
@@ -866,6 +953,7 @@ function volverDelHelp() {
     </script>
 </body>
 </html>
+
 
 
 
