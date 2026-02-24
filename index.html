@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub - Lakerss</title>
+    <title>Game Hub</title>
     <style>
         /* CSS: Estética Elegante (Dark Navy & Gold) */
         :root {
@@ -167,6 +167,31 @@
         }
 
         .counter-big { font-size: 6rem; font-weight: 900; color: var(--accent); margin: 0; line-height: 1; text-shadow: 0 0 20px rgba(239, 225, 167, 0.2); }
+
+        /* ESTILOS NUEVO JUEGO: STOP */
+        .btn-toggle {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-toggle.active-toggle {
+            background: var(--success);
+            color: #064e3b;
+            border-color: var(--success);
+            opacity: 1;
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+            transform: scale(1.02);
+        }
+        
+        .stop-letra-box {
+            font-size: 5rem;
+            color: var(--danger);
+            line-height: 1;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -180,9 +205,10 @@
             <button onclick="showScreen('ruleta-setup')">🎡 Hedbanz</button>
             <button onclick="showScreen('cafe-setup')">☕ Café o Té</button>
             <button onclick="showScreen('dibujar-setup')">🎨 A Dibujar</button>
+            <button onclick="showScreen('stop-setup')">🛑 Rápido (STOP)</button>
         </div>
 
-<div id="dibujar-setup" class="screen">
+        <div id="dibujar-setup" class="screen">
             <h2>🎨 A DIBUJAR</h2>
             <p>¿Cuántas personas van a adivinar?</p>
             <input type="number" id="dibujo-num-jugadores" value="2" min="1" max="10">
@@ -212,6 +238,7 @@
             <input type="text" id="input-idea-dibujo" placeholder="Tu respuesta...">
             <button onclick="guardarIdeaJugador()">GUARDAR IDEA</button>
         </div>
+        
         <div id="dibujar-results" class="screen">
             <h2>RESULTADOS</h2>
             <p>La solución era:</p>
@@ -220,6 +247,7 @@
             <button onclick="showScreen('dibujar-setup')">JUGAR OTRA VEZ</button>
             <button class="btn-secondary" onclick="showScreen('menu')">MENÚ PRINCIPAL</button>
         </div>
+        
         <div id="impostor-config" class="screen">
             <h2>🕵️ CONFIGURACIÓN</h2>
             <p>¿Cuántos jugadores sois?</p>
@@ -290,7 +318,54 @@
             <button class="btn-secondary" onclick="iniciarCafe()">⏭️ SIGUIENTE PALABRA</button>
         </div>
 
-    </div>
+        <div id="stop-setup" class="screen">
+            <h2>🛑 RÁPIDO (STOP)</h2>
+            <p>¿Cuántos vais a jugar?</p>
+            <input type="number" id="stop-num-jugadores" value="3" min="2" max="10">
+            <button onclick="configurarNombresStop()">SIGUIENTE</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">VOLVER</button>
+        </div>
+
+        <div id="stop-nombres" class="screen">
+            <h2>NOMBRES</h2>
+            <div id="contenedor-nombres-stop"></div>
+            <button onclick="empezarPartidaStop()">¡EMPEZAR PARTIDA!</button>
+        </div>
+
+        <div id="stop-play" class="screen">
+            <div class="role-box" style="margin-bottom: 10px; min-height: auto; padding: 10px;">
+                <span style="font-size: 1rem; color: var(--secondary);">LETRA DE LA RONDA</span>
+                <div id="stop-letra" class="stop-letra-box">A</div>
+            </div>
+            
+            <p id="stop-cat-count" style="margin: 5px 0;">Categoría 1 de X</p>
+            <div class="role-box" id="stop-categoria" style="font-size: 2rem; min-height: 100px;">
+                ---
+            </div>
+            
+            <div id="stop-countdown" class="counter-big" style="display:none;">3</div>
+            
+            <button id="btn-stop-game" class="btn-danger" style="padding: 30px 20px; font-size: 2rem; border-radius: 20px;" onclick="pulsarStop()">
+                🛑 ¡STOP!
+            </button>
+        </div>
+
+        <div id="stop-voting" class="screen">
+            <h2>¿QUIÉN ACERTÓ?</h2>
+            <p>Selecciona quién dijo una palabra válida</p>
+            <div id="stop-voting-list"></div>
+            <button onclick="guardarPuntosStop()" style="margin-top: 20px;">SIGUIENTE CATEGORÍA</button>
+        </div>
+
+        <div id="stop-results" class="screen">
+            <h2>🏆 PUNTUACIONES</h2>
+            <div id="stop-score-list" style="margin-bottom: 20px;"></div>
+            <button onclick="showScreen('stop-setup')">JUGAR OTRA VEZ</button>
+            <button class="btn-secondary" onclick="showScreen('menu')">MENÚ PRINCIPAL</button>
+        </div>
+
+</div>
+
 
     <script>
         // --- NAVEGACIÓN GLOBAL ---
@@ -659,12 +734,12 @@
         //  JUEGO 5: CAFÉ O TÉ (DATOS RESTAURADOS)
         // ==========================================
         const palabrasCafeTe = [
-            "Cepillo de dientes", "Ventilador", "Calcetín", "Mando a distancia", 
-            "Gorra", "Botella", "Cojín", "Toalla", "Llaves", "Cuaderno",
-            "Mochila", "Cargador", "Microondas", "Maceta", "Silla", "Mesa",
-            "Lámpara", "Alfombra", "Espejo", "Perfume", "Cinturón",
-            "Servilleta", "Bicicleta", "Monedero", "Anillo", "Collar",
-            "Pendientes", "Zapatilla", "Bolsa", "Papelera"
+            "Elfo", "Correos", "Colores", "McFlurry", 
+            "OkeyMas", "Botella", "Cojín", "Toalla", "Llaves", "Cuaderno",
+            "San Jorge", "San Fermines", "Microondas", "Tarta de Queso", "Silla", "coche",
+            "España", "Alfombra", "Espejo", "Perfume", "Limpiar",
+            "Castañas", "Bicicleta", "Piso", "Anillo", "Fútbol",
+            "Mary Shelley", "Tostadas", "Bolsa", "Papelera"
         ];
         
         let contadorCafe = 20;
@@ -704,9 +779,151 @@
                 el.style.color = "var(--accent)";
             }
         }
+        // ==========================================
+        //  JUEGO 6: RÁPIDO (STOP)
+        // ==========================================
+        const stopCategoriasBase = [
+            "Nombre propio", "Animal", "Ciudad o País", "Color", 
+            "Comida", "Objeto", "Profesión", "Película o Serie", 
+            "Marca", "Famoso/a", "Parte del cuerpo", "Ropa"
+        ];
+        const stopLetras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+        
+        let stopJugadores = [];
+        let stopCategoriasRonda = [];
+        let letraActual = "";
+        let categoriaActualIndice = 0;
+        let countdownInterval;
+
+        function configurarNombresStop() {
+            const num = document.getElementById('stop-num-jugadores').value;
+            const contenedor = document.getElementById('contenedor-nombres-stop');
+            contenedor.innerHTML = "";
+            for(let i=1; i<=num; i++) {
+                contenedor.innerHTML += `<input type="text" placeholder="Jugador ${i}" class="input-nombre-stop">`;
+            }
+            showScreen('stop-nombres');
+        }
+
+        function empezarPartidaStop() {
+            const inputs = document.querySelectorAll('.input-nombre-stop');
+            stopJugadores = [];
+            inputs.forEach(input => {
+                let nombre = input.value.trim();
+                if(nombre !== "") stopJugadores.push({ nombre: nombre, puntos: 0 });
+            });
+
+            if(stopJugadores.length < 2) {
+                alert("Introduce al menos dos nombres válidos.");
+                return;
+            }
+
+            // Calcular número de categorías (Mínimo 4, Máximo = num jugadores)
+            let numCategorias = Math.max(4, stopJugadores.length);
+            
+            // Mezclar y elegir categorías
+            let categoriasMezcladas = [...stopCategoriasBase].sort(() => 0.5 - Math.random());
+            stopCategoriasRonda = categoriasMezcladas.slice(0, numCategorias);
+            
+            // Generar letra aleatoria
+            letraActual = stopLetras[Math.floor(Math.random() * stopLetras.length)];
+            document.getElementById('stop-letra').innerText = letraActual;
+            
+            categoriaActualIndice = 0;
+            mostrarSiguienteCategoriaStop();
+        }
+
+        function mostrarSiguienteCategoriaStop() {
+            if (categoriaActualIndice >= stopCategoriasRonda.length) {
+                mostrarResultadosStop();
+                return;
+            }
+
+            // Resetear UI
+            document.getElementById('btn-stop-game').style.display = "block";
+            document.getElementById('stop-countdown').style.display = "none";
+            
+            document.getElementById('stop-cat-count').innerText = `Categoría ${categoriaActualIndice + 1} de ${stopCategoriasRonda.length}`;
+            document.getElementById('stop-categoria').innerText = stopCategoriasRonda[categoriaActualIndice].toUpperCase();
+            
+            showScreen('stop-play');
+        }
+
+        function pulsarStop() {
+            const btnStop = document.getElementById('btn-stop-game');
+            const countdownEl = document.getElementById('stop-countdown');
+            
+            btnStop.style.display = "none";
+            countdownEl.style.display = "block";
+            
+            let cuenta = 3;
+            countdownEl.innerText = cuenta;
+            
+            countdownInterval = setInterval(() => {
+                cuenta--;
+                if(cuenta > 0) {
+                    countdownEl.innerText = cuenta;
+                } else {
+                    clearInterval(countdownInterval);
+                    countdownEl.innerText = "¡TIEMPO!";
+                    setTimeout(prepararVotacionStop, 1000); // Dar 1 segundo para ver "¡TIEMPO!"
+                }
+            }, 1000);
+        }
+
+        function prepararVotacionStop() {
+            const lista = document.getElementById('stop-voting-list');
+            lista.innerHTML = "";
+            
+            stopJugadores.forEach((jugador, index) => {
+                lista.innerHTML += `
+                    <button class="btn-toggle" id="stop-vote-${index}" onclick="toggleVotoStop(${index})">
+                        ${jugador.nombre}
+                    </button>`;
+            });
+            
+            showScreen('stop-voting');
+        }
+
+        function toggleVotoStop(index) {
+            const btn = document.getElementById(`stop-vote-${index}`);
+            btn.classList.toggle('active-toggle');
+        }
+
+        function guardarPuntosStop() {
+            stopJugadores.forEach((jugador, index) => {
+                const btn = document.getElementById(`stop-vote-${index}`);
+                if(btn.classList.contains('active-toggle')) {
+                    jugador.puntos += 1;
+                }
+            });
+            
+            categoriaActualIndice++;
+            mostrarSiguienteCategoriaStop();
+        }
+
+        function mostrarResultadosStop() {
+            // Ordenar por puntos (de mayor a menor)
+            stopJugadores.sort((a, b) => b.puntos - a.puntos);
+            
+            const lista = document.getElementById('stop-score-list');
+            lista.innerHTML = "";
+            
+            stopJugadores.forEach((j, i) => {
+                let medalla = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "🔹";
+                lista.innerHTML += `
+                    <div class="role-box" style="margin: 10px 0; min-height: auto; padding: 15px; font-size: 1.2rem; flex-direction: row; justify-content: space-between;">
+                        <span>${medalla} ${j.nombre}</span>
+                        <span style="color: var(--danger); font-size: 1.5rem;">${j.puntos} pts</span>
+                    </div>`;
+            });
+            
+            showScreen('stop-results');
+        }
     </script>
 </body>
 </html>
+
 
 
 
