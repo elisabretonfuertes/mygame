@@ -26,6 +26,10 @@
         .btn-pastel-yellow { background:#fdffb6; color:#5a5a00; box-shadow:none; }
         .btn-pastel-green { background:#caffbf; color:#004d00; box-shadow:none; }
         .btn-pastel-blue { background:#a0c4ff; color:#002a5a; box-shadow:none; }
+        .btn-correcto {
+    background-color: #4ade80 !important; /* verde */
+    color: #000042 !important;
+}
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg);
@@ -881,16 +885,18 @@
             const lista = document.getElementById('stop-voting-list');
             lista.innerHTML = "";
             
-            stopJugadores.forEach((jugador, index) => {
-                lista.innerHTML += `
-                    <button class="btn-toggle" id="stop-vote-${index}" onclick="toggleVotoStop(${index})">
-                        ${jugador.nombre}
-                    </button>`;
-            });
-            
+        stopJugadores.forEach((jugador, index) => {
+            lista.innerHTML += `
+                <button class="btn-toggle" onclick="marcarCorrecto(this)">
+                    ${jugador.nombre}
+                </button>`;
+        });
+                    
             showScreen('stop-voting');
         }
-
+        function marcarCorrecto(boton) {
+            boton.classList.add("btn-correcto");
+        }
         function toggleVotoStop(index) {
             const btn = document.getElementById(`stop-vote-${index}`);
             btn.classList.toggle('active-toggle');
@@ -955,6 +961,7 @@ function showHelp(juego) {
     </script>
 </body>
 </html>
+
 
 
 
