@@ -948,17 +948,63 @@ function showHelp(juego) {
     });
 
     const manual = {
-        impostor: "<b>Objetivo:</b> Descubrir quién no conoce la palabra secreta.<br><br>1. Todos verán una palabra excepto el Impostor.<br>2. Cada uno dice una palabra relacionada.<br>3. Debatid y votad quién miente.",
+                impostor: "
+        <b>Objetivo:</b> Descubrir quién no conoce la palabra secreta.<br><br>
         
-        pais: "<b>Objetivo:</b> Localizar el país que aparece en pantalla.<br><br>1. Aparecerá el nombre de un país aleatorio.<br>2. Usa un mapa o tus conocimientos para encontrarlo antes que los demás.",
+        1. Todos verán una palabra excepto el Impostor.<br>
+        2. Cada uno dice una palabra relacionada.<br>
+        3. Debatid y votad quién miente.<br><br>
         
-        hedbanz: "<b>Objetivo:</b> Adivinar la mayor cantidad de palabras posible.<br><br>1. Ponte el móvil en la frente.<br>2. Haz preguntas de sí o no.<br>3. ¡Tienes 2 minutos!",
+        <b>Recompensa:</b><br>
+        🕵️ Impostor: +1 ⭐ por cada participante que haya engañado y -1 ⭐ si no ha engañado a nadie.<br>
+        👥 Resto: +1 ⭐ si se adivina quién es el impostor y -1 ⭐ si se falla .
+        ",
         
-        cafe: "<b>Objetivo:</b> Adivinar el objeto secreto con pistas limitadas.<br><br>1. Una persona sabe el objeto.<br>2. Solo tenéis 20 pistas en total.",
+        pais: "<b>Objetivo:</b> Localizar el país que aparece en pantalla.<br><br>
+            1. Aparecerá el nombre de un país aleatorio.<br>
+            2. Usa el mapa para encontrarlo.<br><br>
+            <b>Recompensa:</b><br>
+        +1 ⭐ Si se localiza correctamente.<br>
+        -1 ⭐ Si no se localiza correctamente.
+            ",
         
-        dibujar: "<b>Objetivo:</b> Adivinar qué está dibujando tu compañero.<br><br>1. 1:30 minutos para dibujar.<br>2. Los demás escriben su respuesta.<br>3. Se revelan las ideas.",
+        hedbanz: "<b>Objetivo:</b> Adivinar la mayor cantidad de palabras posible.<br><br>
+            1. Ponte el móvil de forma que no lo veas.<br>
+            2. Haz preguntas de sí o no.<br>
+            3. ¡Tienes dos minutos!<br><br>
+            <b>Recompensa:</b><br>
+        +1 ⭐ Si se adivinan más de 3 palabras."
+            ,
         
-        stop: "<b>Objetivo:</b> Ser el más rápido en decir una palabra por categoría.<br><br>1. Se elige una letra.<br>2. Aparece una categoría.<br>3. El primero que pulse STOP gana si es correcta."
+        cafe: "<b>Objetivo:</b> Adivinar el objeto secreto con pistas limitadas.<br><br>
+            1. Una persona sabe el objeto.<br>
+            2. Solo tenéis 20 palabras en total.<br>
+            3. Se puede utilizar una pista extra cuando queden 5 palabras.<br><br>
+            <b>Recompensa:</b><br>
+        +3 ⭐ Si se adivina sin pista.<br>
+        +1 ⭐ Si se adivina con pista.<br>
+    
+            ",
+        
+        dibujar: "<b>Objetivo:</b> Adivinar qué está dibujando tu compañero.<br><br>
+            1. 1:30 minutos para dibujar.<br>
+            2. Los demás escriben su respuesta.<br>
+            3. Se revelan las ideas.<br><br>
+            <b>Recompensa:</b><br>
+        🖌️ Dibujante: +1 ⭐ por cada participante que haya adivinado y -1 ⭐ si no adivina nadie.<br>
+        👥 Resto: +1 ⭐ si se adivina  y -1 ⭐ si se falla.
+            ",
+        
+        stop: "<b>Objetivo:</b> Ser el más rápido en decir una palabra por categoría.<br><br>
+            1. Se elige una letra.<br>
+            2. Aparece una categoría.<br>
+            3. El primero que tenga una respuesta pulsa STOP.<br>
+            4. Cuando el contador acaba todos dicen su palabra <br>
+            5. Si no se coincide y es correcta, el jugador gana un punto.<br><br>
+             <b>Recompensa:</b><br>
+         +1 ⭐  Por cada punto recibido. <br>
+        -1 ⭐  Si no se ha adivinado ninguna.
+            "
     };
 
     titulo.innerText = "CÓMO JUGAR";
@@ -973,6 +1019,7 @@ function showHelp(juego) {
     </script>
 </body>
 </html>
+
 
 
 
