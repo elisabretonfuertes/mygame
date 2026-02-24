@@ -894,9 +894,9 @@
                     
             showScreen('stop-voting');
         }
-        function marcarCorrecto(boton) {
-            boton.classList.add("btn-correcto");
-        }
+function marcarCorrecto(boton) {
+    boton.classList.toggle("btn-correcto");
+}
         function toggleVotoStop(index) {
             const btn = document.getElementById(`stop-vote-${index}`);
             btn.classList.toggle('active-toggle');
@@ -961,6 +961,7 @@ function showHelp(juego) {
     </script>
 </body>
 </html>
+
 
 
 
